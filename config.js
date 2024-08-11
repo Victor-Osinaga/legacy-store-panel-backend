@@ -47,7 +47,8 @@ const config = {
     client_id: process.env.CLIENT_ID,
     token_uri: process.env.TOKEN_URI,
     auth_provider_x509_cert_url: process.env.AUTH_PROVIDER_CERT_URL,
-    client_x509_cert_url: process.env.CLIENT_CERT_URL
+    client_x509_cert_url: process.env.CLIENT_CERT_URL,
+    universe_domain: process.env.UNIVERSE_DOMAIN
   },
   storage_bucket: process.env.STORAGE_BUCKET
 }
