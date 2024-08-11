@@ -36,6 +36,8 @@ const config = {
     user: process.env.EMAIL_ADMIN,
     pass: process.env.GMAILPASSWORD
   },
+
+  // FIREBASE CONFIG
   firebaseAccountKey: {
     type: process.env.TYPE,
     project_id: process.env.PROJECT_ID,
