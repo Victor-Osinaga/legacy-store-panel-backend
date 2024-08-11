@@ -1,19 +1,24 @@
 import fetch from 'node-fetch';
 import config from '../../config.js'
 
-
-const API_LEGACY_BASE_URL = config.API_LEGACY_BASE_URL;
+let api_legacy_admin;
+if(config.env == 'dev'){
+    api_legacy_admin = config.back_legacy_admin_dev
+}else{
+    api_legacy_admin = config.back_legacy_admin_prod
+}
 
 export default async function verifyToken(req, res, next) {
     const {access_token} = req.cookies;
     console.log("access_token", access_token);
     try {
-        const response = await fetch(`${API_LEGACY_BASE_URL}/clients/auth/verify-token`,
+        const response = await fetch(`${api_legacy_admin}/clients/auth/verify-token`,
             {
                 method: 'GET', // o 'POST' dependiendo de tu endpoint
                 headers: { 
                     // 'Content-Type': 'application/json',
-                    'Cookie': `access_token=${access_token}`
+                    'Cookie': `access_token=${access_token}`,
+                    'Origin': 'http://localhost:8080'
                 },
                 credentials: 'include', // Importante para incluir las cookies en la solicitud
             }

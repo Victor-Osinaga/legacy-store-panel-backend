@@ -22,15 +22,15 @@
 import config from '../../../config.js';
 import { productSchema } from '../../model/product/schema/product.schema.js'
 
-async function getProductDao() {
+async function getProductDao(dbName) {
     let productDao;
 
-    if (config.env == 'prod') {
-        const { defaul: ProductProdDAO } = await import('./ProductProd.dao.js');
-        productDao = new ProductProdDAO('products', productSchema);
-    } else {
+    if (config.env == 'dev') {
         const { default: ProductDevDAO } = await import('./ProductDev.dao.js')
-        productDao = new ProductDevDAO('products', productSchema)
+        productDao = new ProductDevDAO('products', productSchema, `${config.dev_url}${dbName}`)
+    } else {
+        const { default: ProductProdDAO } = await import('./ProductProd.dao.js');
+        productDao = new ProductProdDAO('products', productSchema, `${config.prod_url1}${dbName}?retryWrites=true&w=majority&appName=Ecommerce`);
     }
 
     return productDao

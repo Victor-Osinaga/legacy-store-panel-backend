@@ -20,7 +20,7 @@ class CategoryService {
     async getCategoryById(id) {
         try {
             const categoryNoDto = await this.categoryRepository.repoGetCategoryById(id);
-            if (!categoryNoDto) throw { msg: "No se encontro una categoria con ese ID" , status: 400}
+            if (!categoryNoDto) throw { msg: "No se encontro una categoria con ese ID", status: 400 }
             // console.log(productNoDto);
             const category = new Category(categoryNoDto)
             return category.convertToDTO()
@@ -30,12 +30,35 @@ class CategoryService {
         }
     }
 
-    async deleteCategoryById(id) {
+    async deleteCategoryById(id, dbname) {
         try {
-            const uncategorized = await this.categoryRepository.repoGetUncategorized()
+            let uncategorized = await this.categoryRepository.repoGetUncategorized()
+            console.log("uncategorized uncategorized", uncategorized);
+            
+            if (!uncategorized) {
+                const categoryUncategorizedNoDto = new Category({
+                    id: uuidv4(),
+                    name: 'Uncategorized',
+                    subCategories: [
+                        {
+                            id: uuidv4(),
+                            name: 'Uncategorized',
+                            categories: [
+                                {
+                                    id: uuidv4(),
+                                    name: 'Uncategorized'
+                                }
+                            ]
+                        }
+                    ]
+                }
+                )
+                const createdCategoryUncategorized = await this.categoryRepository.repoCreateCategory(categoryUncategorizedNoDto.convertToDTO())
+                uncategorized = await this.categoryRepository.repoGetUncategorized()
+            }
             console.log("uncategorized", uncategorized);
-            if (uncategorized[0].id == id){
-                throw {msg: "No se puede eliminar esta categoria", status: 403 }
+            if (uncategorized.id == id) {
+                throw { msg: "No se puede eliminar esta categoria", status: 403 }
             }
 
             const categoryNoDto = await this.categoryRepository.repoGetCategoryById(id);
@@ -43,18 +66,18 @@ class CategoryService {
 
             const deletedCategory = await this.categoryRepository.repoDeleteCategoryById(id);
 
-            
-            if(deletedCategory.deletedCount > 0){
-                const productService = await productServiceFactory()
+
+            if (deletedCategory.deletedCount > 0) {
+                const productService = await productServiceFactory(dbname)
                 const products = await productService.getProducts()
                 products.forEach(async prod => {
-                    if(prod.categories.find(c => c.categoria.id == id) /* && prod.categories.length == 1 PARA CAMBIAR LA CATEGORIA SI TIENE UNA SOLA ASIGNADA AL PRODUCTO PERO SI TIENE MAS CATEGORIAS ELIMINAR LA CATEGORIA A ELIMINAR DEL PRODUCTO*/){
+                    if (prod.categories.find(c => c.categoria.id == id) /* && prod.categories.length == 1 PARA CAMBIAR LA CATEGORIA SI TIENE UNA SOLA ASIGNADA AL PRODUCTO PERO SI TIENE MAS CATEGORIAS ELIMINAR LA CATEGORIA A ELIMINAR DEL PRODUCTO*/) {
                         console.log("producto con categoria a eliminar");
 
                         const updatedCategories = [{
-                            categoria: { id: uncategorized[0].id, name: uncategorized[0].name },
-                            subCategoria: { id: uncategorized[0].subCategories[0].id, name: uncategorized[0].subCategories[0].name},
-                            subSubCategoria: {id: uncategorized[0].subCategories[0].categories[0].id, name: uncategorized[0].subCategories[0].categories[0].name}
+                            categoria: { id: uncategorized.id, name: uncategorized.name },
+                            subCategoria: { id: uncategorized.subCategories[0].id, name: uncategorized.subCategories[0].name },
+                            subSubCategoria: { id: uncategorized.subCategories[0].categories[0].id, name: uncategorized.subCategories[0].categories[0].name }
                         }]
                         const uncategorizedProduct = {
                             ...prod,
@@ -64,8 +87,8 @@ class CategoryService {
 
                         console.log("uncategorizedProduct", uncategorizedProduct);
 
-                        const updatedProduct = await productService.updateProductById(prod.id, uncategorizedProduct)
-                        if(updatedProduct) {
+                        const updatedProduct = await productService.updateProductById(prod.id, uncategorizedProduct, dbname)
+                        if (updatedProduct) {
                             console.log("producto actualizado XDDDD: ", prod.name);
                         }
                     }
@@ -90,58 +113,58 @@ class CategoryService {
         }
     }
 
-    async updateCategoryById(idCategory, body) {
-        try {
-            const categoryByIdNoDto = await this.categoryRepository.repoGetCategoryById(idCategory);
-            if (!categoryByIdNoDto) throw { msg: "No se encontro una categoria con ese ID" }
+    // async updateCategoryById(idCategory, body) {
+    //     try {
+    //         const categoryByIdNoDto = await this.categoryRepository.repoGetCategoryById(idCategory);
+    //         if (!categoryByIdNoDto) throw { msg: "No se encontro una categoria con ese ID" }
 
-            const categoryByName = await this.categoryRepository.repoGetCategoryByName(body.name)
-            if (categoryByName && categoryByName.id != categoryByIdNoDto.id) throw { msg: "Ya existe una categoria con ese nombre primario" }
-            // if(body.name == categoryByIdNoDto.name) throw {msg: "Ya existe una categoria con ese nombre primario"}
+    //         const categoryByName = await this.categoryRepository.repoGetCategoryByName(body.name)
+    //         if (categoryByName && categoryByName.id != categoryByIdNoDto.id) throw { msg: "Ya existe una categoria con ese nombre primario" }
+    //         // if(body.name == categoryByIdNoDto.name) throw {msg: "Ya existe una categoria con ese nombre primario"}
 
 
-            const toUpdateCategory = new Category({
-                id: idCategory,
-                name: body.name,
-                subCategories: body.subCategories
-            })
+    //         const toUpdateCategory = new Category({
+    //             id: idCategory,
+    //             name: body.name,
+    //             subCategories: body.subCategories
+    //         })
 
-            const updatedCategory = await this.categoryRepository.repoUpdateCategoryById(idCategory, toUpdateCategory.convertToDTO())
-            if (updatedCategory) {
-                const products = await productService.getProducts()
-                for (const prod of products) {
-                    for (let index = 0; index < prod.categories.length; index++) {
-                        const cat = prod.categories[index];
-                        if (cat.categoria.id == updatedCategory.id && cat.categoria.name != updatedCategory.name) {
-                            prod.categories[index].categoria.name = updatedCategory.name;
-                            const updProd = await productService.updateProductById(prod.id, { ...prod });
-                            console.log("updprod", updProd.categories[0]);
-                        }
-                        for (let index2 = 0; index2 < updatedCategory.subCategories.length; index2++) {
-                            if (cat.subCategoria.id == updatedCategory.subCategories[index2].id && cat.subCategoria.name != updatedCategory.subCategories[index2].name) {
-                                prod.categories[index].subCategoria.name = updatedCategory.subCategories[index2].name;
-                                const updProd = await productService.updateProductById(prod.id, { ...prod });
-                                console.log("updprod", updProd.categories[0]);
-                            }
-                            for (let index3 = 0; index3 < updatedCategory.subCategories[index2].categories.length; index3++) {
-                                if (cat.subSubCategoria.id == updatedCategory.subCategories[index2].categories[index3].id && cat.subSubCategoria.name != updatedCategory.subCategories[index2].categories[index3].name) {
-                                    prod.categories[index].subSubCategoria.name = updatedCategory.subCategories[index2].categories[index3].name
-                                    const updProd = await productService.updateProductById(prod.id, { ...prod });
-                                    console.log("updprod", updProd.categories[0]);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+    //         const updatedCategory = await this.categoryRepository.repoUpdateCategoryById(idCategory, toUpdateCategory.convertToDTO())
+    //         if (updatedCategory) {
+    //             const products = await productService.getProducts()
+    //             for (const prod of products) {
+    //                 for (let index = 0; index < prod.categories.length; index++) {
+    //                     const cat = prod.categories[index];
+    //                     if (cat.categoria.id == updatedCategory.id && cat.categoria.name != updatedCategory.name) {
+    //                         prod.categories[index].categoria.name = updatedCategory.name;
+    //                         const updProd = await productService.updateProductById(prod.id, { ...prod });
+    //                         console.log("updprod", updProd.categories[0]);
+    //                     }
+    //                     for (let index2 = 0; index2 < updatedCategory.subCategories.length; index2++) {
+    //                         if (cat.subCategoria.id == updatedCategory.subCategories[index2].id && cat.subCategoria.name != updatedCategory.subCategories[index2].name) {
+    //                             prod.categories[index].subCategoria.name = updatedCategory.subCategories[index2].name;
+    //                             const updProd = await productService.updateProductById(prod.id, { ...prod });
+    //                             console.log("updprod", updProd.categories[0]);
+    //                         }
+    //                         for (let index3 = 0; index3 < updatedCategory.subCategories[index2].categories.length; index3++) {
+    //                             if (cat.subSubCategoria.id == updatedCategory.subCategories[index2].categories[index3].id && cat.subSubCategoria.name != updatedCategory.subCategories[index2].categories[index3].name) {
+    //                                 prod.categories[index].subSubCategoria.name = updatedCategory.subCategories[index2].categories[index3].name
+    //                                 const updProd = await productService.updateProductById(prod.id, { ...prod });
+    //                                 console.log("updprod", updProd.categories[0]);
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
 
-            return updatedCategory
+    //         return updatedCategory
 
-        } catch (error) {
-            console.log("desde CATEGORY service", error);
-            throw error
-        }
-    }
+    //     } catch (error) {
+    //         console.log("desde CATEGORY service", error);
+    //         throw error
+    //     }
+    // }
 
     async createCategory(body) {
         let longitudSubCategories = body.subCategories?.length
@@ -188,6 +211,17 @@ class CategoryService {
                 }
             }
             console.log("Desde category service", error);
+            throw error
+        }
+    }
+
+    // SERVICES CATEGORY API STORE
+    async getCategoriesStore() {
+        try {
+            const categories = await this.categoryRepository.repoGetCategoriesStore();
+            return categories;
+        } catch (error) {
+            console.log("desde category service", error);
             throw error
         }
     }

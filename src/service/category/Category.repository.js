@@ -34,15 +34,15 @@ class CategoryRepository{
         }
     }
 
-    async repoGetCategoryByName(name) {
-        try {
-            const categoryByName = await this.dao.getCategoryByName(name)
-            return categoryByName
-        } catch (error) {
-            console.log("desde category repository", error);
-            throw error
-        }
-    }
+    // async repoGetCategoryByName(name) {
+    //     try {
+    //         const categoryByName = await this.dao.getCategoryByName(name)
+    //         return categoryByName
+    //     } catch (error) {
+    //         console.log("desde category repository", error);
+    //         throw error
+    //     }
+    // }
 
     async repoDeleteCategoryById(id)  {
         try {
@@ -54,15 +54,15 @@ class CategoryRepository{
         }
     }
 
-    async repoUpdateCategoryById(id, newCategory){
-        try {
-            const updatedCategory = await this.dao.updateCategoryById(id, newCategory)
-            return updatedCategory
-        } catch (error) {
-            console.log("desde category repository", error);
-            throw error
-        }
-    }
+    // async repoUpdateCategoryById(id, newCategory){
+    //     try {
+    //         const updatedCategory = await this.dao.updateCategoryById(id, newCategory)
+    //         return updatedCategory
+    //     } catch (error) {
+    //         console.log("desde category repository", error);
+    //         throw error
+    //     }
+    // }
 
     async repoCreateCategory(categoryDto){
         try {
@@ -76,10 +76,22 @@ class CategoryRepository{
 
     async repoGetUncategorized(){
         try {
-            const uncategorized = await this.dao.getUncategorized("uncategorized")
+            const uncategorized = await this.dao.getUncategorized("Uncategorized")
             return uncategorized
         } catch (error) {
             console.log("desde category repository : repoGetUncategorized");
+            throw error
+        }
+    }
+
+    // REPOSITORY CATEGORY API STORE
+
+    async repoGetCategoriesStore () {
+        try {
+            const categories = await this.dao.getCategoriesStore()
+            return categories
+        } catch (error) {
+            console.log("desde category repository", error);
             throw error
         }
     }

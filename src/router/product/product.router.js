@@ -7,11 +7,12 @@ import firebase from 'firebase-admin'
 import multer from 'multer';
 import config from "../../../config.js";
 import { deleteFolderRecursive } from "../../utils/deletePath.js";
+import { productServiceFactory } from "../../service/product/product.factory.js";
 // import { isLogged } from "../../middlewares/isLogged.js";
 // import { isAdmin } from "../../middlewares/isAdmin.js";
-// import { productService } from "../../service/product/product.factory.js";
 import getUrlBase from "../../utils/getUrlBase.js";
 import verifyToken from "../../middlewares/verifyToken.js";
+import verifySubdomain from "../../middlewares/verifySubdomain.js";
 
 
 const upload = multer({ dest: "/tmp/uploads" });
@@ -24,89 +25,97 @@ firebase.initializeApp({
 });
 
 const v1ProductRouter = new Router()
+const v1ProductRouterStore = new Router()
 
 v1ProductRouter.get('/', verifyToken, productController.getProducts)
-// v1ProductRouter.get('/:id', productController.getProductById)
+v1ProductRouter.get('/:id', verifyToken, productController.getProductById)
 
 // reemplazar el midleware por el midleware "deleteImage"
-// v1ProductRouter.delete('/:id', /*isLogged, isAdmin,*/ async (req, res, next) => {
-//     try {
-//         const bucket = firebase.storage().bucket();
+v1ProductRouter.delete('/:id', verifyToken, async (req, res, next) => {
+    try {
+        const bucket = firebase.storage().bucket();
 
-//         // buscar producto
-//         const findProduct = await productService.getProductById(req.params.id)
+        // buscar producto
+        const dbname = req.subdomain
+        const productService = await productServiceFactory(dbname)
+        const findProduct = await productService.getProductById(req.params.id)
 
-//         // encontrar la extension
-//         const regex = /(?:\.([^.?]+))(?:\?.*)?$/;
-//         const extension = findProduct.image.match(regex)[1];
+        // encontrar la extension
+        const regex = /(?:\.([^.?]+))(?:\?.*)?$/;
+        const extension = findProduct.image.match(regex)[1];
 
-//         // buscar el archivo
-//         const file = bucket.file(`${req.params.id}.${extension}`)
+        // buscar el archivo
+        const file = bucket.file(`${req.params.id}.${extension}`)
 
-//         // comprobar si existe
-//         const [exists] = await file.exists() /* La respues viene como: [false] o [true] */
+        // comprobar si existe
+        const [exists] = await file.exists() /* La respues viene como: [false] o [true] */
 
-//         if (!exists) {
-//             throw { msg: "Imagen no encontrada", status: 404 }
-//         }
+        if (!exists) {
+            throw { msg: "Imagen no encontrada", status: 404 }
+        }
 
-//         const xd = await file.delete()
-//         next()
-//     } catch (error) {
-//         console.log("desde middleware eliminar imagen : product router", error);
-//         if(error.code) {return res.status(error.code).json({status: "failed", data: "No se pudo eliminar la imagen porque no existe"})}
-//         res.status(error.status).json({ status: "failed", data: error.msg })
-//     }
-// }, productController.deleteProductById)
+        const xd = await file.delete()
+        next()
+    } catch (error) {
+        console.log("desde middleware eliminar imagen : product router", error);
+        if(error.code) {return res.status(error.code).json({status: "failed", data: "No se pudo eliminar la imagen porque no existe"})}
+        res.status(error.status).json({ status: "failed", data: error.msg })
+    }
+}, productController.deleteProductById)
 
-// v1ProductRouter.put('/:id', upload.none(), /*isLogged, isAdmin,*/ productController.updateProductById)
+v1ProductRouter.put('/:id', verifyToken, upload.none(), /*isLogged, isAdmin,*/ productController.updateProductById)
 
-// v1ProductRouter.post("/", verifyToken, /*isLogged, isAdmin,*/ upload.single("image"), (req, res, next) => {
-//     // return res.status(499).json({status: "failed", data: "error breakpoint"})
-//     // console.log("el body", req.body);
-//     const file = req.file;
-//     const bucket = firebase.storage().bucket();
-//     const customId = uuidv4()
-//     const extension = req.file.originalname.split('.').pop();
-//     const newFileName = `${customId}.${extension}`;
-//     // console.log("el PRODUCTI DESDE POST", req.body);
-//     bucket.upload(file.path, {
-//         destination: newFileName,
-//         public: true
-//     }).then(() => {
-//         const fileNew = bucket.file(newFileName);
+v1ProductRouter.post("/", verifyToken, /*isLogged, isAdmin,*/ upload.single("image"), (req, res, next) => {
+    // return res.status(499).json({status: "failed", data: "error breakpoint"})
+    // console.log("el body", req.body);
+    const file = req.file;
+    const bucket = firebase.storage().bucket();
+    const customId = uuidv4()
+    const extension = req.file.originalname.split('.').pop();
+    const newFileName = `${customId}.${extension}`;
+    // console.log("el PRODUCTI DESDE POST", req.body);
+    bucket.upload(file.path, {
+        destination: newFileName,
+        public: true
+    }).then(() => {
+        const fileNew = bucket.file(newFileName);
 
-//         fileNew.getSignedUrl({
-//             action: "read",
-//             expires: "03-09-2491"
-//         }).then(signedUrls => {
-//             const url = signedUrls[0];
-//             // console.log(`La URL de la imagen es: ${url}`);
-//             // res.status(200).json({status: "Imagen subida con éxito", url: url});
+        fileNew.getSignedUrl({
+            action: "read",
+            expires: "03-09-2491"
+        }).then(signedUrls => {
+            const url = signedUrls[0];
+            // console.log(`La URL de la imagen es: ${url}`);
+            // res.status(200).json({status: "Imagen subida con éxito", url: url});
 
-//             const urlBase = getUrlBase(url)
-//             // console.log("url", url);
-//             // console.log("urlBase", urlBase);
+            const urlBase = getUrlBase(url)
+            // console.log("url", url);
+            // console.log("urlBase", urlBase);
 
-//             req.body.image = urlBase
-//             req.body.id = customId
-//             deleteFolderRecursive(folderPath);
-//             next()
-//         }).catch(err => {
-//             console.error(`Error al obtener la URL: ${err}`);
-//         });
-
-
-//         // console.log(`Carpeta ${folderPath} borrada`);
-//         // console.log(`Carpeta ${folderPath} creada`);
-//     }).catch(error => {
-//         res.status(500).send(error);
-//     });
+            req.body.image = urlBase
+            req.body.id = customId
+            deleteFolderRecursive(folderPath);
+            next()
+        }).catch(err => {
+            console.error(`Error al obtener la URL: ${err}`);
+        });
 
 
+        // console.log(`Carpeta ${folderPath} borrada`);
+        // console.log(`Carpeta ${folderPath} creada`);
+    }).catch(error => {
+        res.status(500).send(error);
+    });
 
-// }, productController.createProduct);
+
+
+}, productController.createProduct);
+
+// ENDPOINTS PRODUCT STORE
+v1ProductRouterStore.post('/', verifySubdomain, productController.getProductsStore)
+v1ProductRouterStore.post('/:id', verifySubdomain, productController.getProductStoreById)
 
 export {
-    v1ProductRouter
+    v1ProductRouter,
+    v1ProductRouterStore
 }
