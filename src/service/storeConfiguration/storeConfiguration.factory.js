@@ -1,6 +1,6 @@
 import { getStoreConfigurationDao } from '../../dao/storeConfiguration/index.dao.js'
 import { StoreConfigurationRepository } from './StoreConfiguration.repository.js'
-import { StoreConfigurationService } from './storeConfiguration.service.js'
+import { StoreConfigurationService } from './StoreConfiguration.service.js'
 
 async function storeConfigurationFactory(dbname) {
     const storeConfigurationDao = await getStoreConfigurationDao(dbname)
