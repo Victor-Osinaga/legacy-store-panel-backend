@@ -2,10 +2,13 @@ import fetch from 'node-fetch';
 import config from '../../config.js'
 
 let api_legacy_admin;
+let front_panel_url;
 if(config.env == 'dev'){
     api_legacy_admin = config.back_legacy_admin_dev
+    front_panel_url= config.front_url_panel_dev
 }else{
     api_legacy_admin = config.back_legacy_admin_prod
+    front_panel_url= config.front_url_panel_prod
 }
 
 export default async function verifyToken(req, res, next) {
@@ -18,7 +21,7 @@ export default async function verifyToken(req, res, next) {
                 headers: { 
                     // 'Content-Type': 'application/json',
                     'Cookie': `access_token=${access_token}`,
-                    'Origin': 'http://localhost:8080'
+                    'Origin': front_panel_url
                 },
                 credentials: 'include', // Importante para incluir las cookies en la solicitud
             }
