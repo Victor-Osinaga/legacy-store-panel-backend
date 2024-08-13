@@ -50,15 +50,19 @@ v1ProductRouter.delete('/:id', verifyToken, async (req, res, next) => {
         // comprobar si existe
         const [exists] = await file.exists() /* La respues viene como: [false] o [true] */
 
-        if (!exists) {
-            throw { msg: "Imagen no encontrada", status: 404 }
+        if (exists) {
+            const xd = await file.delete()
+            next()
+        } else {
+            // throw { msg: "Imagen no encontrada", status: 404 }
+            console.log("Imagen no encontrada");
+            next()
         }
 
-        const xd = await file.delete()
-        next()
+
     } catch (error) {
         console.log("desde middleware eliminar imagen : product router", error);
-        if(error.code) {return res.status(error.code).json({status: "failed", data: "No se pudo eliminar la imagen porque no existe"})}
+        if (error.code) { return res.status(error.code).json({ status: "failed", data: "No se pudo eliminar la imagen porque no existe" }) }
         res.status(error.status).json({ status: "failed", data: error.msg })
     }
 }, productController.deleteProductById)
