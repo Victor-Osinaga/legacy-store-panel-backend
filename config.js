@@ -6,7 +6,7 @@ const config = {
   // PUERTO
   PORT: process.env.PORT,
   // ______________________________________________________________
-  // backend legacy store ADMIN
+  // backend LEGACY STORE ADMIN
   back_legacy_admin_dev : process.env.BACK_LEGACY_ADMIN_DEV,
   back_legacy_admin_prod : process.env.BACK_LEGACY_ADMIN_PROD,
   // ______________________________________________________________
