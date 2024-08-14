@@ -13,80 +13,95 @@ const app = express()
 // const allowedOriginPatternFrontPanelDev = /^https?:\/\/([a-z0-9]+)\.localhost(:\d+)?$/;
 // const allowedOriginPatternFrontPanelProd = /^https?:\/\/([a-z0-9-]+)\.legacy-panel\.vercel\.app$/;
 // const allowedOriginPatternFrontStoreProd = /^https?:\/\/([a-z0-9-]+)\.legacy-store\.vercel\.app$/;
-let allowedOrigins;
-if(config.env == 'dev'){
-  console.log("MODO DEV");
+// let allowedOrigins;
+// if(config.env == 'dev'){
+//   console.log("MODO DEV");
   
-  allowedOrigins = [
-    config.front_url_panel_dev,
-    config.front_url_store_dev,  // Otro ejemplo de origen explícito
-    // Agrega otros orígenes explícitos si es necesario
-  ]
-}else{
-  console.log("MODO PROD");
-  allowedOrigins = [
-    config.front_url_panel_prod,
-    config.front_url_store_prod,  // Otro ejemplo de origen explícito
-    // Agrega otros orígenes explícitos si es necesario
-  ]
-}
+//   allowedOrigins = [
+//     config.front_url_panel_dev,
+//     config.front_url_store_dev,  // Otro ejemplo de origen explícito
+//     // Agrega otros orígenes explícitos si es necesario
+//   ]
+// }else{
+//   console.log("MODO PROD");
+//   allowedOrigins = [
+//     config.front_url_panel_prod,
+//     config.front_url_store_prod,  // Otro ejemplo de origen explícito
+//     // Agrega otros orígenes explícitos si es necesario
+//   ]
+// }
 
 
-app.use(cors(
-  {
-    // origin: "https://legacy-store.vercel.app",
-    origin: function (origin, callback) {
-        // console.log("origin", origin);
+// app.use(cors(
+//   {
+//     // origin: "https://legacy-store.vercel.app",
+//     origin: function (origin, callback) {
+//         // console.log("origin", origin);
 
-        // Permitir solicitudes sin origen, como desde POSTMAN o cURL
-        if (!origin) return callback(null, true);
+//         // Permitir solicitudes sin origen, como desde POSTMAN o cURL
+//         if (!origin) return callback(null, true);
 
-        // // Extraer el subdominio usando la expresión regular
-        // const matchdev = origin.match(allowedOriginPatternFrontPanelDev);
+//         // Extraer el subdominio usando la expresión regular
+//         const matchdev = origin.match(allowedOriginPatternFrontPanelDev);
 
-        // if (matchdev) {
-        //     const subdomain = matchdev[1]; // 'viktor' en 'http://viktor.localhost:5173'
-        //     console.log("Subdominio detectado Panel MODO DEV:", subdomain);
+//         if (matchdev) {
+//             const subdomain = matchdev[1]; // 'viktor' en 'http://viktor.localhost:5173'
+//             console.log("Subdominio detectado Panel MODO DEV:", subdomain);
 
-        //     // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
+//             // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
 
-        //     return callback(null, true);
-        // }
+//             return callback(null, true);
+//         }
 
-        // // Extraer el subdominio usando la expresión regular
-        // const matchprod = origin.match(allowedOriginPatternFrontPanelProd);
+//         // Extraer el subdominio usando la expresión regular
+//         const matchprod = origin.match(allowedOriginPatternFrontPanelProd);
 
-        // if (matchprod) {
-        //     const subdomain = matchprod[1]; // 'viktor' en 'http://viktor.localhost:5173'
-        //     console.log("Subdominio detectado Panel MODO PROD:", subdomain);
+//         if (matchprod) {
+//             const subdomain = matchprod[1]; // 'viktor' en 'http://viktor.localhost:5173'
+//             console.log("Subdominio detectado Panel MODO PROD:", subdomain);
 
-        //     // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
+//             // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
 
-        //     return callback(null, true);
-        // }
+//             return callback(null, true);
+//         }
 
-        // // Extraer el subdominio usando la expresión regular
-        // const matchStoreProd = origin.match(allowedOriginPatternFrontStoreProd);
+//         // Extraer el subdominio usando la expresión regular
+//         const matchStoreProd = origin.match(allowedOriginPatternFrontStoreProd);
 
-        // if (matchStoreProd) {
-        //     const subdomain = matchStoreProd[1]; // 'viktor' en 'http://viktor.localhost:5173'
-        //     console.log("Subdominio detectado Store MODO PROD:", subdomain);
+//         if (matchStoreProd) {
+//             const subdomain = matchStoreProd[1]; // 'viktor' en 'http://viktor.localhost:5173'
+//             console.log("Subdominio detectado Store MODO PROD:", subdomain);
 
-        //     // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
+//             // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
 
-        //     return callback(null, true);
-        // }
+//             return callback(null, true);
+//         }
 
-        // Si el origen coincide con la lista de orígenes permitidos explícitos
-        if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
-        } else {
-            return callback(new Error('No permitido por CORS'));
-        }
-    },
-    credentials: true,      // Permitir cookies y otros credenciales
-}
-));
+//         // Si el origen coincide con la lista de orígenes permitidos explícitos
+//         if (allowedOrigins.includes(origin)) {
+//             return callback(null, true);
+//         } else {
+//             return callback(new Error('No permitido por CORS'));
+//         }
+//     },
+//     credentials: true,      // Permitir cookies y otros credenciales
+// }
+// ));
+
+const allowedOrigins = ['https://legacy-panel.vercel.app', 'http://localhost:5173'];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por CORS'));
+    }
+  },
+  credentials: true, // Habilita el envío de credenciales
+};
+
+app.use(cors(corsOptions));
 app.use(express.static('public'))
 app.use(express.json())
 app.use(cookieParser())
