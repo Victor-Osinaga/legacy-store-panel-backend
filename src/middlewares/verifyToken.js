@@ -21,13 +21,15 @@ export default async function verifyToken(req, res, next) {
                 headers: { 
                     // 'Content-Type': 'application/json',
                     'Cookie': `access_token=${access_token}`,
-                    'Origin': back_origin_url
+                    'Origin': `${back_origin_url}`
                 },
                 credentials: 'include', // Importante para incluir las cookies en la solicitud
             }
         )
 
         const result = await response.json();
+        console.log('informacion recibida de api-legacy', result);
+        console.log('informacion recibida de api-legacy', response);
 
         if (!response.ok) {
             // throw {msg: result.data}
@@ -38,11 +40,10 @@ export default async function verifyToken(req, res, next) {
         // console.log("desde verifyToken service2", result);
         // console.log("verifyToken : services2", result.data);
 
-        console.log('informacion recibida de api-legacy', result);
         req.subdomain = result.data.subdomain
         next()
 
     } catch (error) {
-        console.log("error desde verifyToken : middlewares");
+        console.log("error desde verifyToken : middlewares", error);
     }
 }

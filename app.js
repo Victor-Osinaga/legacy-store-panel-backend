@@ -10,9 +10,9 @@ import config from './config.js';
 
 const app = express()
 
-const allowedOriginPatternFrontPanelDev = /^https?:\/\/([a-z0-9]+)\.localhost(:\d+)?$/; // Patrón para subdominios de localhost
-const allowedOriginPatternFrontPanelProd = /^https?:\/\/([a-z0-9-]+)\.legacy-panel\.vercel\.app$/;
-const allowedOriginPatternFrontStoreProd = /^https?:\/\/([a-z0-9-]+)\.legacy-store\.vercel\.app$/;
+// const allowedOriginPatternFrontPanelDev = /^https?:\/\/([a-z0-9]+)\.localhost(:\d+)?$/;
+// const allowedOriginPatternFrontPanelProd = /^https?:\/\/([a-z0-9-]+)\.legacy-panel\.vercel\.app$/;
+// const allowedOriginPatternFrontStoreProd = /^https?:\/\/([a-z0-9-]+)\.legacy-store\.vercel\.app$/;
 let allowedOrigins;
 if(config.env == 'dev'){
   console.log("MODO DEV");
@@ -41,41 +41,41 @@ app.use(cors(
         // Permitir solicitudes sin origen, como desde POSTMAN o cURL
         if (!origin) return callback(null, true);
 
-        // Extraer el subdominio usando la expresión regular
-        const matchdev = origin.match(allowedOriginPatternFrontPanelDev);
+        // // Extraer el subdominio usando la expresión regular
+        // const matchdev = origin.match(allowedOriginPatternFrontPanelDev);
 
-        if (matchdev) {
-            const subdomain = matchdev[1]; // 'viktor' en 'http://viktor.localhost:5173'
-            console.log("Subdominio detectado Panel MODO DEV:", subdomain);
+        // if (matchdev) {
+        //     const subdomain = matchdev[1]; // 'viktor' en 'http://viktor.localhost:5173'
+        //     console.log("Subdominio detectado Panel MODO DEV:", subdomain);
 
-            // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
+        //     // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
 
-            return callback(null, true);
-        }
+        //     return callback(null, true);
+        // }
 
-        // Extraer el subdominio usando la expresión regular
-        const matchprod = origin.match(allowedOriginPatternFrontPanelProd);
+        // // Extraer el subdominio usando la expresión regular
+        // const matchprod = origin.match(allowedOriginPatternFrontPanelProd);
 
-        if (matchprod) {
-            const subdomain = matchprod[1]; // 'viktor' en 'http://viktor.localhost:5173'
-            console.log("Subdominio detectado Panel MODO PROD:", subdomain);
+        // if (matchprod) {
+        //     const subdomain = matchprod[1]; // 'viktor' en 'http://viktor.localhost:5173'
+        //     console.log("Subdominio detectado Panel MODO PROD:", subdomain);
 
-            // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
+        //     // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
 
-            return callback(null, true);
-        }
+        //     return callback(null, true);
+        // }
 
-        // Extraer el subdominio usando la expresión regular
-        const matchStoreProd = origin.match(allowedOriginPatternFrontStoreProd);
+        // // Extraer el subdominio usando la expresión regular
+        // const matchStoreProd = origin.match(allowedOriginPatternFrontStoreProd);
 
-        if (matchStoreProd) {
-            const subdomain = matchStoreProd[1]; // 'viktor' en 'http://viktor.localhost:5173'
-            console.log("Subdominio detectado Store MODO PROD:", subdomain);
+        // if (matchStoreProd) {
+        //     const subdomain = matchStoreProd[1]; // 'viktor' en 'http://viktor.localhost:5173'
+        //     console.log("Subdominio detectado Store MODO PROD:", subdomain);
 
-            // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
+        //     // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
 
-            return callback(null, true);
-        }
+        //     return callback(null, true);
+        // }
 
         // Si el origen coincide con la lista de orígenes permitidos explícitos
         if (allowedOrigins.includes(origin)) {
