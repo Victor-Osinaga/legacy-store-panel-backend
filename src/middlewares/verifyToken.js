@@ -19,7 +19,7 @@ export default async function verifyToken(req, res, next) {
             {
                 method: 'GET', // o 'POST' dependiendo de tu endpoint
                 headers: { 
-                    // 'Content-Type': 'application/json',
+                    'Content-Type': 'application/json',
                     'Cookie': `access_token=${access_token}`,
                     'Origin': `${back_origin_url}`
                 },
