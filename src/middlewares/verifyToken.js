@@ -33,7 +33,7 @@ export default async function verifyToken(req, res, next) {
 
         if (!response.ok) {
             // throw {msg: result.data}
-            return res.status(response.status).jso( {status: result.status, data: result.data} )
+            return res.status(response.status).json( {status: result.status, data: result.data} )
         }
 
         // console.log("response desde veriyToken2", response);
