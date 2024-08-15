@@ -96,12 +96,13 @@ const corsOptions = {
     if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {
-      callback(new Error('No permitido por CORS'));
+      callback(new Error('No permitido por CORSSSSS'));
     }
   },
   credentials: true, // Habilita el envío de credenciales
 };
 
+// Aplica CORS a todas las rutas
 app.use(cors(corsOptions));
 app.use(express.static('public'))
 app.use(express.json())
