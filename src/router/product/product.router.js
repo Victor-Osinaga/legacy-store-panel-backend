@@ -13,6 +13,8 @@ import { productServiceFactory } from "../../service/product/product.factory.js"
 import getUrlBase from "../../utils/getUrlBase.js";
 import verifyToken from "../../middlewares/verifyToken.js";
 import verifySubdomain from "../../middlewares/verifySubdomain.js";
+import verifyTokenAdmin from "../../middlewares/verifyTokenAdmin.js";
+import getClientDb from "../../middlewares/getClientDb.js";
 
 
 const upload = multer({ dest: "/tmp/uploads" });
@@ -27,11 +29,11 @@ firebase.initializeApp({
 const v1ProductRouter = new Router()
 const v1ProductRouterStore = new Router()
 
-v1ProductRouter.get('/', verifyToken, productController.getProducts)
-v1ProductRouter.get('/:id', verifyToken, productController.getProductById)
+v1ProductRouter.get('/', verifyTokenAdmin, getClientDb, productController.getProducts)
+v1ProductRouter.get('/:id', verifyTokenAdmin, getClientDb, productController.getProductById)
 
 // reemplazar el midleware por el midleware "deleteImage"
-v1ProductRouter.delete('/:id', verifyToken, async (req, res, next) => {
+v1ProductRouter.delete('/:id', verifyTokenAdmin, getClientDb, async (req, res, next) => {
     try {
         const bucket = firebase.storage().bucket();
 
@@ -67,9 +69,9 @@ v1ProductRouter.delete('/:id', verifyToken, async (req, res, next) => {
     }
 }, productController.deleteProductById)
 
-v1ProductRouter.put('/:id', verifyToken, upload.none(), /*isLogged, isAdmin,*/ productController.updateProductById)
+v1ProductRouter.put('/:id', verifyTokenAdmin, getClientDb, upload.none(), /*isLogged, isAdmin,*/ productController.updateProductById)
 
-v1ProductRouter.post("/", verifyToken, /*isLogged, isAdmin,*/ upload.single("image"), (req, res, next) => {
+v1ProductRouter.post("/",verifyTokenAdmin, getClientDb, upload.single("image"), (req, res, next) => {
     // return res.status(499).json({status: "failed", data: "error breakpoint"})
     // console.log("el body", req.body);
     const file = req.file;
