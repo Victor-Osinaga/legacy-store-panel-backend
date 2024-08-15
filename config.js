@@ -20,9 +20,10 @@ const config = {
   back_origin_url_dev: process.env.BACK_ORIGIN_URL_DEV,
   back_origin_url_prod: process.env.BACK_ORIGIN_URL_PROD,
   // ______________________________________________________________
-  // DATABASES
+  // DATABASES ADMIN
   dev_url_database_admin: process.env.DEV_URL_DATABASE_ADMIN,
   prod_url_database_admin: process.env.PROD_URL_DATABASE_ADMIN,
+  // DATABASES CLIENTS
   dev_url: process.env.DEV_URL,
   prod_url1: process.env.PROD_URL1,
   prod_url2: process.env.PROD_URL2,
