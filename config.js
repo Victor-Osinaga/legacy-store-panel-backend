@@ -40,7 +40,7 @@ const config = {
     pass: process.env.GMAILPASSWORD
   },
 
-  // FIREBASE CONFIG ______________________________________________________________
+  // FIREBASE CONFIG MI CUENTA ______________________________________________________________
   firebaseAccountKey: {
     type: process.env.TYPE,
     project_id: process.env.PROJECT_ID,
