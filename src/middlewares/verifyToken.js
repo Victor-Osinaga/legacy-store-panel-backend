@@ -1,49 +1,22 @@
-import fetch from 'node-fetch';
-import config from '../../config.js'
+import jwt from 'jsonwebtoken'
+import config from '../../config.js';
 
-let api_legacy_admin;
-let back_origin_url;
-if(config.env == 'dev'){
-    api_legacy_admin = config.back_legacy_admin_dev
-    back_origin_url= config.back_origin_url_dev
-}else{
-    api_legacy_admin = config.back_legacy_admin_prod
-    back_origin_url= config.back_origin_url_prod
-}
+const PRIVATE_KEY = config.private_key_jwt;
 
-export default async function verifyToken(req, res, next) {
+export default function verifyToken (req, res, next) {
     const {access_token} = req.cookies;
-    console.log("access_token", access_token);
-    try {
-        const response = await fetch(`${api_legacy_admin}/clients/auth/verify-token`,
-            {
-                method: 'GET', // o 'POST' dependiendo de tu endpoint
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Cookie': `access_token=${access_token}`,
-                    'Origin': `${back_origin_url}`
-                },
-                credentials: 'include', // Importante para incluir las cookies en la solicitud
-            }
-        )
+    console.log("access_token desde midleware verifyToken", access_token);
 
-        const result = await response.json();
-        console.log('informacion recibida de api-legacy', result);
-        console.log('informacion recibida de api-legacy', response);
+    if(!access_token){
+        return res.status(401).json({ status: "failed", data: "No hay token" })
+    }
 
-        if (!response.ok) {
-            // throw {msg: result.data}
-            return res.status(response.status).json( {status: result.status, data: result.data} )
+    jwt.verify(access_token, PRIVATE_KEY, (err, client) => {
+        if(err){
+            return res.status(403).json( {status: "failed", data: "Token invalido"} )
         }
 
-        // console.log("response desde veriyToken2", response);
-        // console.log("desde verifyToken service2", result);
-        // console.log("verifyToken : services2", result.data);
-
-        req.subdomain = result.data.subdomain
+        req.clientId = client.data
         next()
-
-    } catch (error) {
-        console.log("error desde verifyToken : middlewares", error);
-    }
+    })
 }

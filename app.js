@@ -5,6 +5,7 @@ import { v1ProductRouter, v1ProductRouterStore } from './src/router/product/prod
 // import { v1UserRouter } from './src/router/user/user.router.js';
 import { v1CategoryRouter, v1CategorieRouterStore } from './src/router/category/category.router.js';
 import { v1StoreConfigurationRouter, v1StoreConfigurationRouterStore } from './src/router/storeConfiguration/storeConfiguration.router.js';
+import { v1ClientAdminRouter } from './src/router/client-admin/client-admin.router.js'
 import cookieParser from 'cookie-parser'
 import config from './config.js';
 
@@ -119,6 +120,9 @@ app.use('/api-panel/store-configuration', v1StoreConfigurationRouter)
 app.use('/api-store/products', v1ProductRouterStore)
 app.use('/api-store/categories', v1CategorieRouterStore)
 app.use('/api-store/store-configuration', v1StoreConfigurationRouterStore)
+
+// ENDPOINTS ADMIN
+app.use('/api-admin/clients', v1ClientAdminRouter)
 
 app.use('/asd', (req, res)=>{
   res.send("olaaa")
