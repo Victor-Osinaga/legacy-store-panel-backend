@@ -93,9 +93,9 @@ const allowedOrigins = ['https://legacy-panel.vercel.app', 'http://localhost:517
 // const allowedOriginPatternFrontStoreProd = /^https?:\/\/([a-z0-9-]+)\.legacy-store\.vercel\.app$/;
 let allowedOriginPatternFrontStore;
 if (config.env == 'dev') {
-  allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy-store\.localhost(:\d+)?$/;
+  allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacystore\.localhost(:\d+)?$/;
 } else {
-  allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy-store\.vercel\.app$/;
+  allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacystore\.vercel\.app$/;
 }
 const corsOptions = {
   origin: (origin, callback) => {

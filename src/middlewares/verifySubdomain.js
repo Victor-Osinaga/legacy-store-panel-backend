@@ -4,9 +4,9 @@ import clientAdminService from '../service/client-admin/client-admin.factory.js'
 
 let allowedOriginPatternFrontStore;
 if(config.env == 'dev'){
-    allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy-store\.localhost(:\d+)?$/;
+    allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacystore\.localhost(:\d+)?$/;
 }else{
-    allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy-store\.vercel\.app$/;
+    allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacystore\.vercel\.app$/;
 }
 
 export default async function verifySubdomain(req, res, next) {
