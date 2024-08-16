@@ -92,13 +92,16 @@ const app = express()
 const allowedOrigins = ['https://legacy-panel.vercel.app', 'http://localhost:5173', 'http://localhost:5174'];
 // const allowedOriginPatternFrontStoreProd = /^https?:\/\/([a-z0-9-]+)\.legacy-store\.vercel\.app$/;
 let allowedOriginPatternFrontStore;
-if(config.env == 'dev'){
-    allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy\.localhost(:\d+)?$/;
-}else{
-    allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy\.vercel\.app$/;
+if (config.env == 'dev') {
+  allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy\.localhost(:\d+)?$/;
+} else {
+  allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy\.vercel\.app$/;
 }
 const corsOptions = {
   origin: (origin, callback) => {
+    // Permitir solicitudes sin origen, como desde POSTMAN o cURL
+    if (!origin) return callback(null, true);
+    
     // Extraer el subdominio usando la expresión regular
     const match = origin.match(allowedOriginPatternFrontStore);
 
