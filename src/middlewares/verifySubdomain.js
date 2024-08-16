@@ -1,49 +1,36 @@
 import fetch from 'node-fetch';
 import config from '../../config.js'
+import clientAdminService from '../service/client-admin/client-admin.factory.js';
 
-let api_legacy_admin;
-let back_origin_url;
+let allowedOriginPatternFrontStore;
 if(config.env == 'dev'){
-    api_legacy_admin = config.back_legacy_admin_dev
-    back_origin_url= config.back_origin_url_dev
+    allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy\.localhost(:\d+)?$/;
 }else{
-    api_legacy_admin = config.back_legacy_admin_prod
-    back_origin_url= config.back_origin_url_prod
+    allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy\.vercel\.app$/;
 }
 
 export default async function verifySubdomain(req, res, next) {
-    console.log("dentro de verifySubdomain", req.body.subdomain);
-    // req.body.subdomain = "asd"
-    
     try {
-        const response = await fetch(`${api_legacy_admin}/clients/auth/verify-subdomain`,
-            {
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Origin': back_origin_url
-                },
-                method: 'POST',
-                body: JSON.stringify( {subdomain: req.body.subdomain})
-            }
-        )
+        const origin = req.headers.origin;
+        console.log("origin", origin);
 
-        const result = await response.json();
-        console.log("desde verifySubdomain service2", result);
+        const matchdev = origin.match(allowedOriginPatternFrontStore);
 
-        if (!response.ok) {
-            // throw {msg: result.data}
-            return res.status(response.status).json( {status: result.status, data: result.data} )
+        if (matchdev) {
+            const subdomain = matchdev[1]; // 'viktor' en 'http://viktor-legacy.localhost:5173'
+            console.log("Subdominio detectado STORE MODO DEV:", subdomain);
+
+            const getClientAdminBySubdomain = await clientAdminService.getClientAdminBySubdomain(subdomain)
+            
+            // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
+            req.subdomain = getClientAdminBySubdomain.subdomain
+            next()
+        }else{
+            console.log("NO SUBDOMAIN");
+            throw {status: 403, msg: "SUBDOMINIO invalido"}
         }
-
-        // console.log("response desde veriyToken2", response);
-        // console.log("verifyToken : services2", result.data);
-
-        // console.log('informacion recibida de api-legacy', result);
-        req.subdomain = result.data.subdomain
-        console.log("subdomain desde verifySubdomain", result.data.subdomain);
-        next()
-
     } catch (error) {
         console.log("error desde verifySubdomain : middlewares");
+        res.status(error.status).json( {status: "failed", data: error.msg} )
     }
 }

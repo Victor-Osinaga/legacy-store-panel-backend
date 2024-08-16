@@ -68,6 +68,25 @@ class ClientAdminService {
             throw error
         }
     }
+
+    async getClientAdminBySubdomain(subdomain) {
+        try {
+            console.log("subdomain desde getClientBySubdomain", subdomain);
+            const clientBySubdomain = await this.clientAdminRepository.repoGetClientAdminBySubdomain(subdomain)
+            if (!clientBySubdomain) {
+                throw { msg: "No existe un cliente con ese subdominio", status: 400 }
+            }
+            return {
+                proyectName: clientBySubdomain.proyectName,
+                name: clientBySubdomain.name,
+                lastname: clientBySubdomain.lastname,
+                subdomain: clientBySubdomain.subdomain
+            }
+        } catch (error) {
+            console.log("desde getClientBySubdomain service", error);
+            throw error
+        }
+    }
 }
 
 export {

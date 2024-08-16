@@ -10,7 +10,7 @@ import getClientDb from "../../middlewares/getClientDb.js";
 const v1StoreConfigurationRouter = new Router()
 const v1StoreConfigurationRouterStore = new Router()
 
-v1StoreConfigurationRouter.post( "/", verifyTokenAdmin, getClientDb, storeConfigurationController.createStoreConfiguration )
+// v1StoreConfigurationRouter.post( "/", verifyTokenAdmin, getClientDb, storeConfigurationController.createStoreConfiguration )
 v1StoreConfigurationRouter.get( "/", verifyTokenAdmin, getClientDb, storeConfigurationController.getStoreConfiguration )
 v1StoreConfigurationRouter.put( "/:id", verifyTokenAdmin, getClientDb, storeConfigurationController.updateStoreConfiguration )
 

@@ -17,7 +17,7 @@ const app = express()
 // let allowedOrigins;
 // if(config.env == 'dev'){
 //   console.log("MODO DEV");
-  
+
 //   allowedOrigins = [
 //     config.front_url_panel_dev,
 //     config.front_url_store_dev,  // Otro ejemplo de origen explícito
@@ -89,10 +89,27 @@ const app = express()
 // }
 // ));
 
-const allowedOrigins = ['https://legacy-panel.vercel.app', 'http://localhost:5173'];
-
+const allowedOrigins = ['https://legacy-panel.vercel.app', 'http://localhost:5173', 'http://localhost:5174'];
+// const allowedOriginPatternFrontStoreProd = /^https?:\/\/([a-z0-9-]+)\.legacy-store\.vercel\.app$/;
+let allowedOriginPatternFrontStore;
+if(config.env == 'dev'){
+    allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy\.localhost(:\d+)?$/;
+}else{
+    allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy\.vercel\.app$/;
+}
 const corsOptions = {
   origin: (origin, callback) => {
+    // Extraer el subdominio usando la expresión regular
+    const match = origin.match(allowedOriginPatternFrontStore);
+
+    if (match) {
+      const subdomain = match[1]; // 'viktor' en 'http://viktor-legacy.localhost:5173'
+      console.log(`Subdominio detectado STORE MODO ${config.env} :`, subdomain);
+
+      // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
+
+      return callback(null, true);
+    }
     if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {
@@ -107,7 +124,7 @@ app.use(cors(corsOptions));
 app.use(express.static('public'))
 app.use(express.json())
 app.use(cookieParser())
-app.use(express.urlencoded({extended:true}))
+app.use(express.urlencoded({ extended: true }))
 
 // ENDPOINTS PANEL
 app.use('/api-panel/products', v1ProductRouter)
@@ -125,13 +142,15 @@ app.use('/api-store/store-configuration', v1StoreConfigurationRouterStore)
 // ENDPOINTS ADMIN
 app.use('/api-admin/clients', v1ClientAdminRouter)
 
-app.use('/asd', (req, res)=>{
+app.use('/asd', (req, res) => {
   res.send("olaaa")
 })
 
 app.all('*', (req, res) => {
-    res.json({ error: `404 Not Found`, 
-    desc: `No se encontro la página que buscas.` });
+  res.json({
+    error: `404 Not Found`,
+    desc: `No se encontro la página que buscas.`
   });
+});
 
-export {app}
+export { app }
