@@ -4,9 +4,9 @@ import clientAdminService from '../service/client-admin/client-admin.factory.js'
 
 let allowedOriginPatternFrontStore;
 if(config.env == 'dev'){
-    allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy\.localhost(:\d+)?$/;
+    allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy-store\.localhost(:\d+)?$/;
 }else{
-    allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy\.vercel\.app$/;
+    allowedOriginPatternFrontStore = /^https?:\/\/([a-z0-9-]+)-legacy-store\.vercel\.app$/;
 }
 
 export default async function verifySubdomain(req, res, next) {
@@ -17,7 +17,7 @@ export default async function verifySubdomain(req, res, next) {
         const matchdev = origin.match(allowedOriginPatternFrontStore);
 
         if (matchdev) {
-            const subdomain = matchdev[1]; // 'viktor' en 'http://viktor-legacy.localhost:5173'
+            const subdomain = matchdev[1]; // 'viktor' en 'http://viktor-legacy-store.localhost:5173'
             console.log("Subdominio detectado STORE MODO DEV:", subdomain);
 
             const getClientAdminBySubdomain = await clientAdminService.getClientAdminBySubdomain(subdomain)
