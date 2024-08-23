@@ -76,10 +76,11 @@ export default class ProductMongo {
 
     async getProducts() {
         try {
-            console.log("P", await this.collection.find({}, { _id: 0, __v: 0 }).lean());
+            // console.log("P", await this.collection.find({}, { _id: 0, __v: 0 }).lean());
             return await this.collection.find({}, { _id: 0, __v: 0 }).lean();
         } catch (error) {
-            console.log("desde container", error);
+            console.log("desde container : getProducts", error);
+            throw error
         }
     }
 
@@ -124,6 +125,7 @@ export default class ProductMongo {
             // console.log("DESDE CONTAINER", newProduct.categories);
             return newProduct
         } catch (error) {
+            console.log("desde container : createProduct", error);
             throw error
         }
     }
@@ -136,7 +138,8 @@ export default class ProductMongo {
             console.log("getProductsStore", await this.collection.find({}, { _id: 0, __v: 0 }).lean());
             return await this.collection.find({}, { _id: 0, __v: 0 }).lean();
         } catch (error) {
-            console.log("desde container", error);
+            console.log("desde container : getProductsStore", error);
+            throw error
         }
     }
 
@@ -146,7 +149,8 @@ export default class ProductMongo {
             console.log("getProductStoreById", await this.collection.findOne({id: id}, { _id: 0, __v: 0 }).lean());
             return await this.collection.findOne({id: id}, { _id: 0, __v: 0 }).lean();
         } catch (error) {
-            console.log("desde container", error);
+            console.log("desde container : getProductStoreById", error);
+            throw error
         }
     }
 }

@@ -11,7 +11,7 @@ export default class CategoryMongo{
     // }
 
     constructor(collection, schema, urlDatabase) {
-        console.log("CONTAINER PRODUCT CREADO");
+        console.log("CONTAINER CATEGORY CREADO");
         
         const newConnection = mongoose.createConnection(urlDatabase, {
             useUnifiedTopology: true,

@@ -117,7 +117,7 @@ class ProductService{
             const newTimestamp = moment().tz('America/Argentina/Buenos_Aires').format('DD/MM/YYYY')
             // console.log("newTimestamp", newTimestamp);
             const productNoDto = new Product({
-                id: id,
+                id: id, /** esta id viene de la subida de imagen anterior a nivel de midleware */
                 price: Number(price),
                 sizes: JSON.parse(sizes),
                 categories: [

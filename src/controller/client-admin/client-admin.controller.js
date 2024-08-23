@@ -14,7 +14,6 @@ const createClientAdmin = async (req, res) => {
 const loginClientAdmin = async (req, res) => {
     try {
         const clientLoged = await clientAdminService.loginClientAdmin(req.body)
-        console.log("clientByEmail", clientLoged);
         const token = await genAuthToken(clientLoged.id)
         res.cookie('access_token', token, {
             secure: true,

@@ -2,12 +2,26 @@ import mongoose from "mongoose";
 mongoose.set('strictQuery', false);
 
 export default class OrderMongo{
-    constructor(collection, schema, url){
-        mongoose.connect(url,{ 
+    // constructor(collection, schema, url){
+    //     mongoose.connect(url,{ 
+    //         useUnifiedTopology: true,
+    //         useNewUrlParser: true,
+    //      });
+    //     this.collection = mongoose.model(collection, schema);
+    // }
+
+    constructor(collection, schema, urlDatabase) {
+        console.log("CONTAINER ORDER CREADO");
+
+        const newConnection = mongoose.createConnection(urlDatabase, {
             useUnifiedTopology: true,
             useNewUrlParser: true,
-         });
-        this.collection = mongoose.model(collection, schema);
+            // dbName: dbname,
+        });
+        this.collectionName = collection;
+        this.schema = schema;
+        this.connections = {}; // Almacena conexiones de base de datos por URL o identificador
+        this.collection = newConnection.model(this.collectionName, this.schema);
     }
 
     async getOrders(){

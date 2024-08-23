@@ -3,7 +3,7 @@ import clientAdminService from "../service/client-admin/client-admin.factory.js"
 export default async function getClientDb (req, res, next){
     try {
         const clientById = await clientAdminService.getClientAdminById(req.clientId)
-        console.log("clientById desde mid getClientDb", clientById);
+        // console.log("clientById desde mid getClientDb", clientById);
         req.subdomain = clientById.subdomain
         next()
     } catch (error) {

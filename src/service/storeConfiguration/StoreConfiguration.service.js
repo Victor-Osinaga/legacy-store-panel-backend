@@ -33,7 +33,7 @@ class StoreConfigurationService {
     async getStoreConfiguration() {
         try {
             const existConfig = await this.storeConfigurationRepository.repoGetStoreConfiguration();
-            console.log("existConfig", existConfig);
+            // console.log("existConfig", existConfig);
 
             // if(existConfig != null) throw { msg: "Ya existe una confiracion para tu tienda con este nombre", status: 400 }
             if (!existConfig) {

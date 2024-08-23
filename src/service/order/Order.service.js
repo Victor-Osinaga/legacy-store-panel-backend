@@ -112,6 +112,108 @@ class OrderService {
         }
     }
 
+    async createPaymentMpStore(data){
+        console.log("data desde createPaymentMpStore", data);
+        
+        try {
+            const productsMP = await Promise.all(data.products.map(async (product) => {
+                const findPorduct = await productService.getProductById(product.id)
+                if(!findPorduct){throw {msg: "No se encontro ese productoooooo"}}
+                return {
+                    id: findPorduct.id,
+                    title: findPorduct.name,
+                    category_id: findPorduct.categories[0].categoria.name,
+                    description: findPorduct.description,
+                    quantity: product.quantity,
+                    unit_price: findPorduct.price,
+                    currency_id: 'ARS',
+                    // picture_url: findPorduct.image
+                }
+            }))
+
+            const productsMetaData = await Promise.all(data.products.map(async (product)=>{
+                const findProduct = await productService.getProductById(product.id)
+                if(!findProduct){throw {msg: "No se encontro ese producto"}}
+                return{
+                    id: findProduct.id,
+                    size: product.size,
+                    color: product.color,
+                    quantity: product.quantity
+                }
+            }))
+
+            let pesoTotalEnGramos = 0;
+            const pesoProductos = await Promise.all(data.products.map(async (product)=>{
+                const findProduct = await productService.getProductById(product.id)
+                if(!findProduct){throw {msg: "No se encontro ese producto"}}
+                pesoTotalEnGramos = pesoTotalEnGramos + (findProduct.pesoGramos * product.quantity)
+            }))
+            console.log("Peso total", pesoTotalEnGramos);
+
+            mercadopago.configure({
+                access_token: config.access_token_mp,
+            })
+
+            console.log("nombre y id", data.shipments.receiver_address.state_name, data.shipments.receiver_address.state_id)
+            let preference = {
+                items: productsMP,
+                payer: {
+                    name: data.payer.name,
+                    surname: data.payer.surname,
+                    email: data.payer.email,
+                    phone: {
+                        area_code: data.payer.phone.area_code,
+                        number: parseInt(data.payer.phone.number)
+                    },
+                    address: {
+                        street_name: data.payer.address.street_name,
+                        street_number: parseInt(data.payer.address.street_number),
+                        zip_code: data.payer.address.zip_code
+                    }
+                },
+                back_urls: {
+                    success: config.success_url_mp,
+                    failure: config.failure_url_mp,
+                },
+                payment_methods: {
+                    excluded_payment_types: [
+                        {
+                            id: "ticket"
+                        }
+                    ],
+                    installments: 12
+                },
+                metadata: {
+                    ...data.metadata,
+                    products: productsMetaData
+                },
+                shipments: {
+                    receiver_address: {
+                        zip_code: data.shipments.receiver_address.zip_code,
+                        state_name: data.shipments.receiver_address.state_name,
+                        city_name: data.shipments.receiver_address.city_name,
+                        street_name: data.shipments.receiver_address.street_name,
+                        street_number: parseInt(data.shipments.receiver_address.street_number)
+                    },
+                    // cost: calcPriceWithZip(pesoTotalEnGramos, data.shipments.receiver_address.state_name),
+                    cost: calcPriceWithZip(pesoTotalEnGramos, data.shipments.receiver_address.state_id),
+                    mode: "not_specified"
+                },
+                notification_url: config.notification_url_mp,
+                statement_descriptor: "Jarry Indumentaria",
+                external_reference: uuidv4(),
+            };
+
+            // const response = await mercadopago.preferences.create(preference)
+            // console.log("ELRESMP", response.body);
+            // const body = response.body
+            // return {init_point: body.init_point, costShipment: body.shipments.cost, idOrder: body.external_reference}
+        } catch (error) {
+            console.log("desde order service create payment MP", error);
+            throw error
+        }
+    }
+
     async getNotificationMP(req) {
         // try {
         //     let objSave = {}

@@ -1,12 +1,17 @@
-import { orderDao } from '../../dao/order/index.dao.js'
-
+import { getOrderDao } from '../../dao/order/index.dao.js'
 import {OrderRepository} from './Order.repository.js'
 import {OrderService} from './Order.service.js'
 
-const repository = new OrderRepository(orderDao)
+async function orderServiceFactory(dbname) {
+    const orderDao = await getOrderDao(dbname)
+    const repository = new OrderRepository(orderDao)
+    return new OrderService(repository)
+}
 
-const orderService = new OrderService(repository)
+// const repository = new OrderRepository(orderDao)
+
+// const orderService = new OrderService(repository)
 
 export {
-    orderService,
+    orderServiceFactory,
 }
