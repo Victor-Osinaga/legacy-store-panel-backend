@@ -61,7 +61,7 @@ class ShimpmentLocal {
 
     // getter y setter SHIPING COST
     setShipingCost(shipingCost) {
-        if (!shipingCost || typeof shipingCost !== 'number') throw { msg: "SHIPING COST es requerido" }
+        if (shipingCost === '' || shipingCost == null || shipingCost == undefined || typeof shipingCost !== 'number') throw { msg: "SHIPING COST es requerido" }
         this.#shipingCost = shipingCost
     }
     getShipingCost() { return this.#shipingCost }

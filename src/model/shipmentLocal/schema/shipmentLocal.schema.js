@@ -3,7 +3,7 @@ import { Schema } from "mongoose";
 const shipmentLocalSquema = new Schema({
     id: {
         type: String,
-        reuired: [true, "required: id shipmentLocal: mongoose squema"]
+        required: [true, "required: id shipmentLocal: mongoose squema"]
     },
     province: {
         type: String,

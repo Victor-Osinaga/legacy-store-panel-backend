@@ -84,7 +84,7 @@ class ProductService{
             })
             // console.log("PRODDD", newProduct.convertToDTO());
             const updatedProductNoDto = await this.productRepository.repoUpdateProductById(idProduct, newProduct.convertToDTO())
-            if(!updatedProductNoDto) throw {msg: "No se pudo actualizar el product"}
+            if(!updatedProductNoDto) throw {msg: "No se pudo actualizar el product", status: 400}
             const newUpdatedProduct = new Product(updatedProductNoDto)
             return newUpdatedProduct.convertToDTO()
         } catch (error) {

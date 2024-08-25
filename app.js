@@ -9,6 +9,7 @@ import { v1ClientAdminRouter } from './src/router/client-admin/client-admin.rout
 import cookieParser from 'cookie-parser'
 import config from './config.js';
 import { v1ShipmentLocalRouter } from './src/router/shipmentLocal/shipmentLocal.router.js';
+import { v1ShipmentDeliveryRouter } from './src/router/shpmentDelivery/shipmentDelivery.router.js';
 
 const app = express()
 
@@ -138,6 +139,7 @@ app.use('/api-panel/products', v1ProductRouter)
 app.use('/api-panel/categories', v1CategoryRouter)
 app.use('/api-panel/store-configuration', v1StoreConfigurationRouter)
 app.use('/api-panel/shipment-local', v1ShipmentLocalRouter)
+app.use('/api-panel/shipment-delivery', v1ShipmentDeliveryRouter)
 
 // ENDPOINTS STORE
 app.use('/api-store/products', v1ProductRouterStore)

@@ -26,8 +26,8 @@ export default class ShipmentLocalMongo {
         }
     }
 
-    async getShipmentLocalByName (shipmentName) {
-        return await this.collection.findOne({ name: shipmentName }, { _id: 0, __v: 0 }).lean()
+    async getShipmentLocalByProvince (shipmentProvince) {
+        return await this.collection.findOne({ province: shipmentProvince }, { _id: 0, __v: 0 }).lean()
     }
 
     async createShipmentLocal(shipmentLocalDto){
@@ -41,5 +41,32 @@ export default class ShipmentLocalMongo {
             console.log("error desde container : createShipmentLocal", error);
             throw error
         }
+    }
+
+    async getShipmentLocalById (id) {
+        return await this.collection.findOne({ id }, { _id: 0, __v: 0 }).lean()
+    }
+
+    async deleteShipmentLocalById(id) {
+        return await this.collection.deleteOne({ id: id });
+    }
+
+    async updateShipmentLocalById(id, data){
+        const update = await this.collection.updateOne(
+            { id: id},
+            {
+                $set: {
+                    id: id,
+                    province: data.province,
+                    locality: data.locality,
+                    postalCode: data.postalCode,
+                    streetName: data.streetName,
+                    streetNumber: data.streetNumber,
+                    shipingCost: data.shipingCost
+                }
+            }
+        )
+
+        return await this.collection.findOne({ id: id }, { _id: 0, __v: 0 }).lean()
     }
 }
