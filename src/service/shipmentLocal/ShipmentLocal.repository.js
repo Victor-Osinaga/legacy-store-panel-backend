@@ -3,6 +3,7 @@ class ShipmentLocalRepository {
         this.dao = dao
     }
 
+    // REPOSITORY API-PANEL
     async repoGetShipmentLocalByProvince(shipmentProvince) {
         try {
             const shipmentLocalByProvinceNoDto = await this.dao.getShipmentLocalByProvince(shipmentProvince)
@@ -64,6 +65,17 @@ class ShipmentLocalRepository {
             return updatedShipmentLocal
         } catch (error) {
             console.log("Error desde ShipmentLocalRepository : repoUpdateShipmentLocalById", error);
+            throw error
+        }
+    }
+
+    // REPOSITORY API-STORE
+    async repoGetShipmentsLocalStore () {
+        try {
+            const shipmentsLocal = await this.dao.getShipmentsLocalStore()
+            return shipmentsLocal
+        } catch (error) {
+            console.log("Error desde ShipmentLocalRepository : repoGetShipmentsLocalStore", error);
             throw error
         }
     }

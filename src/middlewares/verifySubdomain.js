@@ -21,9 +21,12 @@ export default async function verifySubdomain(req, res, next) {
             console.log("Subdominio detectado STORE MODO DEV:", subdomain);
 
             const getClientAdminBySubdomain = await clientAdminService.getClientAdminBySubdomain(subdomain)
+            console.log("getClientAdminBySubdomain : middleware : verify subdomain", getClientAdminBySubdomain);
+            
             
             // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
-            req.subdomain = getClientAdminBySubdomain.subdomain
+            req.proyectName = getClientAdminBySubdomain.proyectName
+            req.clientInfo = getClientAdminBySubdomain
             next()
         }else{
             console.log("NO SUBDOMAIN");

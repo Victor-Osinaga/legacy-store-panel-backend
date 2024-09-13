@@ -1,7 +1,8 @@
 import { shipmentLocalServiceFactory } from "../../service/shipmentLocal/shipmentLocal.factory.js"
 
+// CONTROLLERS API-PANEL
 const createShipmentLocal = async (req, res) => {
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const shipmentLocalService = await shipmentLocalServiceFactory(dbname)
         console.log("body shipmentLocal create", req.body);
@@ -14,7 +15,7 @@ const createShipmentLocal = async (req, res) => {
 }
 
 const getShipmentsLocal = async (req, res) => {
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const shipmentLocalService = await shipmentLocalServiceFactory(dbname)
         const shipmentsLocal = await shipmentLocalService.getShipmentsLocal()
@@ -26,7 +27,7 @@ const getShipmentsLocal = async (req, res) => {
 }
 
 const deleteShipmentLocalById = async (req, res) => {
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const shipmentLocalService = await shipmentLocalServiceFactory(dbname)
         const deletedShipmentLocal = await shipmentLocalService.deleteShipmentLocalById(req.params.shipmentLocalId);
@@ -38,7 +39,7 @@ const deleteShipmentLocalById = async (req, res) => {
 }
 
 const getShipmentLocalById = async (req, res) => {
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const shipmentLocalService = await shipmentLocalServiceFactory(dbname)
         const shipmentLocal = await shipmentLocalService.getShipmentLocalById(req.params.shipmentLocalId);
@@ -52,7 +53,7 @@ const getShipmentLocalById = async (req, res) => {
 const updateShipmentLocalById = async (req, res) => {
     console.log("body desde updateShipmentLocalById", req.body);
     
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const shipmentLocalService = await shipmentLocalServiceFactory(dbname)
         const shipmentLocalUpdated = await shipmentLocalService.updateShipmentLocalById(req.params.shipmentLocalId, req.body);
@@ -63,10 +64,24 @@ const updateShipmentLocalById = async (req, res) => {
     }
 }
 
+// CONTROLLERS API-STORE
+const getShipmentsLocalStore = async(req, res) => {
+    const dbname = req.proyectName
+    try {
+        const shipmentLocalService = await shipmentLocalServiceFactory(dbname)
+        const shipmentsLocal = await shipmentLocalService.getShipmentsLocalStore();
+        res.status(200).json({status: "ok", data: shipmentsLocal})
+    } catch (error) {
+        console.log("desde getShipmentsLocalStore : controller", error );
+        res.status(error.status).json({status: "failed", data: error.msg})
+    }
+}
+
 export {
     createShipmentLocal,
     getShipmentsLocal,
     deleteShipmentLocalById,
     getShipmentLocalById,
-    updateShipmentLocalById
+    updateShipmentLocalById,
+    getShipmentsLocalStore
 }

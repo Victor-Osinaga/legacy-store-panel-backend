@@ -62,7 +62,15 @@ class ClientAdminService {
             if (!clientById) {
                 throw { msg: "No existe un cliente con ese Id", status: 400 }
             }
-            return clientById
+            console.log("CLIENT BY IDDDDDDDDDDDDDDDDD",clientById);
+            
+            return {
+                proyectName: clientById.proyectName,
+                name: clientById.name,
+                lastname: clientById.lastname,
+                subdomain: clientById.subdomain,
+                email: clientById.email
+            }
         } catch (error) {
             console.log("desde getClientById service", error);
             throw error
@@ -80,7 +88,8 @@ class ClientAdminService {
                 proyectName: clientBySubdomain.proyectName,
                 name: clientBySubdomain.name,
                 lastname: clientBySubdomain.lastname,
-                subdomain: clientBySubdomain.subdomain
+                subdomain: clientBySubdomain.subdomain,
+                email: clientBySubdomain.email
             }
         } catch (error) {
             console.log("desde getClientBySubdomain service", error);

@@ -4,7 +4,7 @@ import { storeConfigurationFactory } from "../../service/storeConfiguration/stor
 const createStoreConfiguration = async (req, res) => {
     console.log("desde controller createStoreConfiguration", req.body);
     
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const storeConfigurationService = await storeConfigurationFactory(dbname)
         const configuration = await storeConfigurationService.createStoreConfiguration(req.body)
@@ -19,7 +19,7 @@ const createStoreConfiguration = async (req, res) => {
 const getStoreConfiguration = async (req, res) => {
     console.log("desde controller getStoreConfigurationDefault", req.body);
     
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const storeConfigurationService = await storeConfigurationFactory(dbname)
         const configuration = await storeConfigurationService.getStoreConfiguration()
@@ -35,7 +35,7 @@ const updateStoreConfiguration = async (req, res) => {
     console.log("desde controller getStoreConfigurationDefault", req.body);
     console.log("configId", req.params.id);
     
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const storeConfigurationService = await storeConfigurationFactory(dbname)
         
@@ -54,7 +54,7 @@ const updateStoreConfiguration = async (req, res) => {
 const getStoreConfigurationStore = async (req, res) => {
     console.log("desde controller getStoreConfigurationStore", req.body);
     
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const storeConfigurationService = await storeConfigurationFactory(dbname)
         const configuration = await storeConfigurationService.getStoreConfigurationStore()

@@ -1,152 +1,110 @@
-class Order{
+class Order {
     #id
-    #paymentId
-    #tipoDePago
-    #metodoDePago
-    #costoEnvio
-    #totalDeCompra
-    #totalConEnvio
-    #netoRecibido
-    #comisionMp
-    #cuotas
-    #fechaDeLiberacion
+    #payment_id
+    #shipment_cost
+    #total_paid_amount
+    #net_received_amount
+    #payment_type
+    #installments
+    #money_release_date
     #timestamp
-    // #tipoEnvio
-    #direccionEnvio
-    #payer
+    #order_status
     #products
-    #status
-    constructor({id, paymentId, tipoDePago, metodoDePago, costoEnvio, totalDeCompra, totalConEnvio, netoRecibido, comisionMp, cuotas, fechaDeLiberacion, timestamp, /*tipoEnvio,*/ direccionEnvio, payer, products, status}){
+    #shipment_info
+    #client_info_contact
+    constructor({
+        id,
+        payment_id,
+        shipment_cost,
+        total_paid_amount,
+        net_received_amount,
+        payment_type,
+        installments,
+        money_release_date,
+        timestamp,
+        order_status,
+        products,
+        shipment_info,
+        client_info_contact,
+    }) {
         this.setId(id)
-        this.setPaymentId(paymentId)
-        this.setTipoDePago(tipoDePago)
-        this.setMetodoDePago(metodoDePago)
-        this.setCostoEnvio(costoEnvio)
-        this.setTotalDeCompra(totalDeCompra)
-        this.setTotalConEnvio(totalConEnvio)
-        this.setNetoRecibido(netoRecibido)
-        this.setComisionMp(comisionMp)
-        this.setCuotas(cuotas)
-        this.setFechaDeLiberacion(fechaDeLiberacion)
+        this.setPaymentId(payment_id)
+        this.setShipmentCost(shipment_cost)
+        this.setTotalPaidAmount(total_paid_amount)
+        this.setNetReceivedAmount(net_received_amount)
+        this.setPaymentType(payment_type)
+        this.setInstallments(installments)
+        this.setMoneyReleaseDate(money_release_date)
         this.setTimestamp(timestamp)
-        // this.setTipoEnvio(tipoEnvio)
-        this.setDireccionEnvio(direccionEnvio)
-        this.setPayer(payer)
+        this.setOrderStatus(order_status)
         this.setProducts(products)
-        this.setStatus(status)
+        this.setShipmentInfo(shipment_info)
+        this.setClientInfoContact(client_info_contact)
     }
 
-    // getter y setter TIPO DE PAGO
+    // getter y setter ID
     setId(id){
         if(!id || id === undefined || id === "" || id.length == 0 || id.trim() == "") throw {msg: "ID es requerida"}
         this.#id = id
     }
     getId(){return this.#id}
 
-    // getter y setter ID
-    // setId(id){
-    //     if(!id || id === undefined || id === "" || id.length == 0 || id.trim() == "") throw {msg: "ID es requerida"}
-    //     this.#id = id
-    // }
-    // getId(){return this.#id}
-
-    // getter y setter NAME
-    // setName(name){
-    //     if(!name || name === undefined || name === "" || name.length == 0 || name.trim() == "") throw {msg: "NAME es requerida"}
-    //     this.#name = name
-    // }
-    // getName(){return this.#name}
-
-    // getter y setter LASTNAME
-    // setLastname(lastname){
-    //     if(!lastname || lastname === undefined || lastname === "" || lastname.length == 0 || lastname.trim() == "") throw {msg: "LASTNAME es requerida"}
-    //     this.#lastname = lastname
-    // }
-    // getLastname(){return this.#lastname}
-
-    // getter y setter EMAIL
-    // setEmail(email){
-    //     if(!email || email === undefined || email === "" || email.length == 0 || email.trim() == "") throw {msg: "EMAIL es requerida"}
-    //     this.#email = email
-    // }
-    // getEmail(){return this.#email}
-
-    // getter y setter PHONE
-    // setPhone(phone){
-    //     if(!phone || phone === undefined || phone === "" || phone.length == 0 || phone.trim() == "") throw {msg: "PHONE es requerida"}
-    //     this.#phone = phone
-    // }
-    // getPhone(){return this.#phone}
-
-    // getter y setter PAYMENT ID
-    setPaymentId(paymentId){
-        if(typeof paymentId !== 'number') throw {msg: "PAYMENT ID es requerida"}
-        this.#paymentId = paymentId
+    // getter y setter PAYMENTID
+    setPaymentId(payment_id){
+        if(!payment_id || payment_id === undefined || payment_id === "" || payment_id.length == 0 || payment_id.trim() == "") throw {msg: "PAYMENT ID es requerida"}
+        this.#payment_id = payment_id
     }
-    getPaymentId(){return this.#paymentId}
+    getPaymentId(){return this.#payment_id}
 
-    // getter y setter TIPO DE PAGO
-    setTipoDePago(tipoDePago){
-        if(!tipoDePago || tipoDePago === undefined || tipoDePago === "" || tipoDePago.length == 0 || tipoDePago.trim() == "") throw {msg: "TIPO DE PAGO es requerida"}
-        this.#tipoDePago = tipoDePago
+    // getter y setter SHIPMENT COST
+    setShipmentCost(shipment_cost){
+        if(!shipment_cost || typeof shipment_cost !== 'number') throw {msg: "SHIPMENT COST es requerido"}
+        this.#shipment_cost = shipment_cost
     }
-    getTipoDePago(){return this.#tipoDePago}
+    getShipmentCost(){return this.#shipment_cost}
 
-    // getter y setter METODO DE PAGO
-    setMetodoDePago(metodoDePago){
-        if(!metodoDePago || metodoDePago === undefined || metodoDePago === "" || metodoDePago.length == 0 || metodoDePago.trim() == "") throw {msg: "METODO DE PAGO es requerida"}
-        this.#metodoDePago = metodoDePago
+    // getter y setter TOTAL PAID AMOUNT
+    setTotalPaidAmount(total_paid_amount){
+        if(!total_paid_amount || typeof total_paid_amount !== 'number') throw {msg: "TOTAL PAID AMOUNT es requerido"}
+        this.#total_paid_amount = total_paid_amount
     }
-    getMetodoDePago(){return this.#metodoDePago}
+    getTotalPaidAmount(){return this.#total_paid_amount}
 
-    // getter y setter COSTO ENVIO
-    setCostoEnvio(costoEnvio){
-        if(typeof costoEnvio !== 'number') throw {msg: "COSTO ENVIO es requerida"}
-        this.#costoEnvio = costoEnvio
+    // getter y setter NET RECEIVER AMOUNT
+    setNetReceivedAmount(net_received_amount){
+        if(!net_received_amount || typeof net_received_amount !== 'number') throw {msg: "NET RECEIVED AMOUNT es requerido"}
+        this.#net_received_amount = net_received_amount
     }
-    getCostoEnvio(){return this.#costoEnvio}
+    getNetReceivedAmount(){return this.#net_received_amount}
 
-    // getter y setter TOTAL DE COMPRA
-    setTotalDeCompra(totalDeCompra){
-        if(typeof totalDeCompra !== 'number') throw {msg: "TOTAL DE COMPRA es requerida"}
-        this.#totalDeCompra = totalDeCompra
+    // getter y setter PAYMENT TYPE
+    setPaymentType(payment_type){
+        if(!payment_type || payment_type === undefined || payment_type === "" || payment_type.length == 0 || payment_type.trim() == "") throw {msg: "PAYMENT TYPE es requerida"}
+        this.#payment_type = payment_type
     }
-    getTotalDeCompra(){return this.#totalDeCompra}
+    getPaymentType(){return this.#payment_type}
 
-    // getter y setter TOTAL CON ENVIO
-    setTotalConEnvio(totalConEnvio){
-        if(typeof totalConEnvio !== 'number') throw {msg: "TOTAL CON ENVIO es requerida"}
-        this.#totalConEnvio = totalConEnvio
+    
+    // getter y setter ORDER STATUS
+    setOrderStatus(order_status){
+        if(!order_status || order_status === undefined || order_status === "" || order_status.length == 0 || order_status.trim() == "") throw {msg: "ORDER STATUS es requerida"}
+        this.#order_status = order_status
     }
-    getTotalConEnvio(){return this.#totalConEnvio}
+    getOrderStatus(){return this.#order_status}
 
-    // getter y setter NETO RECIBIDO
-    setNetoRecibido(netoRecibido){
-        if(typeof netoRecibido !== 'number') throw {msg: "NETO RECIBIDO es requerida"}
-        this.#netoRecibido = netoRecibido
+    // getter y setter INSTALLMENTS
+    setInstallments(installments){
+        if(!installments || typeof installments !== 'number') throw {msg: "INSTALLMENTS es requerido"}
+        this.#installments = installments
     }
-    getNetoRecibido(){return this.#netoRecibido}
+    getInstallments(){return this.#installments}
 
-    // getter y setter COMISION MP
-    setComisionMp(comisionMp){
-        if(typeof comisionMp !== 'number') throw {msg: "COMISION MP es requerida"}
-        this.#comisionMp = comisionMp
+    // getter y setter MONEY RELEASE DATE
+    setMoneyReleaseDate(money_release_date){
+        if(!money_release_date || money_release_date === undefined || money_release_date === "" || money_release_date.length == 0 || money_release_date.trim() == "") throw {msg: "MONEY RELEASE DATE es requerida"}
+        this.#money_release_date = money_release_date
     }
-    getComisionMp(){return this.#comisionMp}
-
-    // getter y setter CUOTAS
-    setCuotas(cuotas){
-        if(Number.isInteger(cuotas) === false) throw {msg: "CUOTAS es requerida"}
-        this.#cuotas = cuotas
-    }
-    getCuotas(){return this.#cuotas}
-
-    // getter y setter FECHA DE LIBERACION
-    setFechaDeLiberacion(fechaDeLiberacion){
-        if(!fechaDeLiberacion || fechaDeLiberacion === undefined || fechaDeLiberacion === "" || fechaDeLiberacion.length == 0 || fechaDeLiberacion.trim() == "") throw {msg: "FECHA DE LIBERACION es requerida"}
-        this.#fechaDeLiberacion = fechaDeLiberacion
-    }
-    getFechaDeLiberacion(){return this.#fechaDeLiberacion}
+    getMoneyReleaseDate(){return this.#money_release_date}
 
     // getter y setter TIMESTAMP
     setTimestamp(timestamp){
@@ -155,63 +113,43 @@ class Order{
     }
     getTimestamp(){return this.#timestamp}
 
-    // getter y setter TIPO_ENVIO
-    // setTipoEnvio(tipoEnvio){
-    //     if(!tipoEnvio || tipoEnvio === undefined || tipoEnvio === "" || tipoEnvio.length == 0 || tipoEnvio.trim() == "") throw {msg: "TIPO ENVIO es requerida"}
-    //     this.#tipoEnvio = tipoEnvio
-    // }
-    // getTipoEnvio(){return this.#tipoEnvio}
-
-    // getter y setter DIRECCION
-    setDireccionEnvio(direccionEnvio){
-        if(!direccionEnvio || direccionEnvio === undefined || typeof direccionEnvio !== "object" ) throw {msg: "DIRECCION DE ENVIO es requerida"}
-        this.#direccionEnvio = direccionEnvio
-    }
-    getDireccionEnvio(){return this.#direccionEnvio}
-
-    // getter y setter PAYER
-    setPayer(payer){
-        if(!payer || payer === undefined || typeof payer !== "object" ) throw {msg: "PAYER es requerida"}
-        this.#payer = payer
-    }
-    getPayer(){return this.#payer}
-
     // getter y setter PRODUCTS
     setProducts(products){
-        if(!products || products === undefined || Array.isArray(products) === false /*|| color === "" || color.length == 0 || color.trim() == ""*/) throw {msg: "PRODUCTS es requerida"}
-        
+        if(!products || !Array.isArray(products)) throw {msg: "PRODUCTS es requerido"}
         this.#products = products
-        // console.log("los prod", this.#products);
     }
     getProducts(){return this.#products}
 
-    // getter y setter STATUS
-    setStatus(status){
-        if(!status || status === undefined || status === "" || status.length == 0 || status.trim() == "") throw {msg: "ID es requerida"}
-        this.#status = status
+    // getter y setter SHIPMENT INFO
+    setShipmentInfo(shipment_info){
+        if(!shipment_info || typeof shipment_info !== 'object') throw {msg: "SHIPMENT INFO es requerido"}
+        this.#shipment_info = shipment_info
     }
-    getStatus(){return this.#status}
+    getShipmentInfo(){return this.#shipment_info}
+
+    // getter y setter CLIENT INFO CONTACT
+    setClientInfoContact(client_info_contact){
+        if(!client_info_contact || typeof client_info_contact !== 'object') throw {msg: "CLIENT INFO CONTACT es requerido"}
+        this.#client_info_contact = client_info_contact
+    }
+    getClientInfoContact(){return this.#client_info_contact}
 
     // DTO
-    convertToDTO(){
+    convertToDTO() {
         return Object.freeze({
             id: this.#id,
-            paymentId: this.#paymentId,
-            tipoDePago: this.#tipoDePago,
-            metodoDePago: this.#metodoDePago,
-            costoEnvio: this.#costoEnvio,
-            totalDeCompra: this.#totalDeCompra,
-            totalConEnvio: this.#totalConEnvio,
-            netoRecibido: this.#netoRecibido,
-            comisionMp: this.#comisionMp,
-            cuotas: this.#cuotas,
-            fechaDeLiberacion: this.#fechaDeLiberacion,
+            payment_id: this.#payment_id,
+            shipment_cost: this.#shipment_cost,
+            total_paid_amount: this.#total_paid_amount,
+            net_received_amount: this.#net_received_amount,
+            payment_type: this.#payment_type,
+            installments: this.#installments,
+            money_release_date: this.#money_release_date,
             timestamp: this.#timestamp,
-            // tipoEnvio: this.#tipoEnvio,
-            direccionEnvio: this.#direccionEnvio,
-            payer: this.#payer,
+            order_status: this.#order_status,
             products: this.#products,
-            status: this.#status
+            shipment_info: this.#shipment_info,
+            client_info_contact: this.#client_info_contact
         })
     }
 }

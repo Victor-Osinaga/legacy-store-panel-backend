@@ -161,6 +161,7 @@ class ProductService{
     async getProductStoreById(id) {
         try {
             const productById = await this.productRepository.repoGetProductStoreById(id);
+            if(!productById) throw {msg: "No se encontro un producto con ese ID", status: 404}
             return productById;
         } catch (error) {
             console.log("desde producto service", error);

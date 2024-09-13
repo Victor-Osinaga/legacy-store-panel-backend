@@ -9,9 +9,13 @@ const shipmentDeliverySchema = new Schema({
         type: String,
         required: [true, "required: province shipmentDelivery: mongoose squema"]
     },
-    shipingCost: {
+    shipmentCost: {
         type: Number,
-        required: [true, "required: shipingCost shipmentDelivery: mongoose squema"]
+        required: [true, "required: shipmentCost shipmentDelivery: mongoose squema"]
+    },
+    shipmentType: {
+        type: String,
+        required: [true, "required: shipmentType shipmentDelivery: mongoose squema"]
     }
 })
 

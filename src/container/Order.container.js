@@ -11,7 +11,7 @@ export default class OrderMongo{
     // }
 
     constructor(collection, schema, urlDatabase) {
-        console.log("CONTAINER ORDER CREADO");
+        // console.log("CONTAINER ORDER CREADO");
 
         const newConnection = mongoose.createConnection(urlDatabase, {
             useUnifiedTopology: true,
@@ -28,6 +28,7 @@ export default class OrderMongo{
         try {
             return await this.collection.find({}, { _id: 0, __v: 0 }).lean();
         } catch (error) {
+            console.log("desde container : getOrders", error);
             throw error
         }
     }
@@ -36,9 +37,10 @@ export default class OrderMongo{
         try {
             const order = new this.collection(orderDto)
             const savedOrder = await order.save(orderDto)
-            if(!savedOrder) throw {msg: "Error en BD al crear la ORDER"}
-            return await this.collection.findOne({paymentID : orderDto.paymentID}, { _id: 0, __v: 0 }).lean();
+            if(!savedOrder) throw {msg: "Error en BD al crear la ORDER", status: 500}
+            return await this.collection.findOne({id : orderDto.id}, { _id: 0, __v: 0 }).lean();
         } catch (error) {
+            console.log("desde container : createOrder", error);
             throw error
         }
     }

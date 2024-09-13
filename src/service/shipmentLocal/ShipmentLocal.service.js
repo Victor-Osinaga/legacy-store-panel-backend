@@ -6,15 +6,17 @@ class ShipmentLocalService {
         this.shipmentLocalRepository = repository
     }
 
+    // SERVICES API-PANEL
     async createShipmentLocal (body, dbname) {
         try {
             const existShipmentLocalByProvince = await this.shipmentLocalRepository.repoGetShipmentLocalByProvince(body.province)
             if(existShipmentLocalByProvince != null) throw {msg: "Ya existe una sucursal en esa provincia", status: 400}
 
-            const {id, shipingCost, ...newBody} = body
+            const {id, shipmentCost, shipingType, ...newBody} = body
             const shipmentLocalNoDto = new ShimpmentLocal({
                 id: uuidv4(),
-                shipingCost: Number(shipingCost),
+                shipmentCost: Number(shipmentCost),
+                shipmentType: "shipment_local",
                 ...newBody
             })
 
@@ -73,11 +75,11 @@ class ShipmentLocalService {
             // const existShipmentLocalByProvince = await this.shipmentLocalRepository.repoGetShipmentLocalByProvince(body.province)
             // if(existShipmentLocalByProvince != null) throw {msg: "Ya existe una sucursal en esa provincia", status: 400}
 
-            const {id, shipingCost, ...newBody} = body
+            const {id, shipmentCost, ...newBody} = body
 
             const newShipmentLocalNoDto = new ShimpmentLocal({
                 id: shipmentLocalNoDto.id,
-                shipingCost: Number(shipingCost),
+                shipmentCost: Number(shipmentCost),
                 ...newBody
             })
 
@@ -88,6 +90,17 @@ class ShipmentLocalService {
             return newUpdatedShipmentLocal.convertToDTO()
         } catch (error) {
             console.log("desde ShipmentLocalService : updateShipmentLocalById", error);
+            throw error
+        }
+    }
+
+    // SERVICES API-STORE
+    async getShipmentsLocalStore (){
+        try {
+            const shipmentsLocal = await this.shipmentLocalRepository.repoGetShipmentsLocalStore();
+            return shipmentsLocal
+        } catch (error) {
+            console.log("desde getShipmentsLocalStore : services");
             throw error
         }
     }

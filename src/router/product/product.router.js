@@ -38,7 +38,7 @@ v1ProductRouter.delete('/:id', verifyTokenAdmin, getClientDb, async (req, res, n
         const bucket = firebase.storage().bucket();
 
         // buscar producto
-        const dbname = req.subdomain
+        const dbname = req.proyectName
         const productService = await productServiceFactory(dbname)
         const findProduct = await productService.getProductById(req.params.id)
 
@@ -71,7 +71,7 @@ v1ProductRouter.delete('/:id', verifyTokenAdmin, getClientDb, async (req, res, n
 
 v1ProductRouter.put('/:id', verifyTokenAdmin, getClientDb, upload.none(), /*isLogged, isAdmin,*/ productController.updateProductById)
 
-v1ProductRouter.post("/",verifyTokenAdmin, getClientDb, upload.single("image"), (req, res, next) => {
+v1ProductRouter.post("/", verifyTokenAdmin, getClientDb, upload.single("image"), (req, res, next) => {
     // return res.status(499).json({status: "failed", data: "error breakpoint"})
     // console.log("el body", req.body);
     const file = req.file;

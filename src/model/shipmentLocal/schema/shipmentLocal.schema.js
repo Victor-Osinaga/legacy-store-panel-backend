@@ -25,10 +25,14 @@ const shipmentLocalSquema = new Schema({
         type: String,
         required: [true, "required: streetNumber shipmentLocal: monoose squema"]
     },
-    shipingCost: {
+    shipmentCost: {
         type: Number,
-        required: [true, "required: shipingCost shipmentLocal: monoose squema"]
+        required: [true, "required: shipmentCost shipmentLocal: monoose squema"]
     },
+    shipmentType: {
+        type: String,
+        required: [true, "required: shipmentType shipmentLocal: mongoose squema"]
+    }
 
 })
 

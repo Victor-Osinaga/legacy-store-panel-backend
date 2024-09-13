@@ -62,11 +62,23 @@ export default class ShipmentLocalMongo {
                     postalCode: data.postalCode,
                     streetName: data.streetName,
                     streetNumber: data.streetNumber,
-                    shipingCost: data.shipingCost
+                    shipmentCost: data.shipmentCost
                 }
             }
         )
 
         return await this.collection.findOne({ id: id }, { _id: 0, __v: 0 }).lean()
+    }
+
+    // CONTAINER API-STORE
+    async getShipmentsLocalStore () {
+        try {
+            const shipmentsLocalStore = await this.collection.find({}, {_id: 0, __v:0}).lean()
+            // console.log("Desde container : getShipmentsLocalStore", shipmentsLocalStore);
+            return shipmentsLocalStore
+        } catch (error) {
+            console.log("Error desde container : getShipmentsLocalStore");
+            throw error
+        }
     }
 }

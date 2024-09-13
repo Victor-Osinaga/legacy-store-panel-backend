@@ -1,6 +1,10 @@
 import { Router } from "express";
 import * as orderController from '../../controller/order/order.controller.js'
 import verifySubdomain from "../../middlewares/verifySubdomain.js";
+import getClientDbMetadata from "../../middlewares/getClientDbMetadata.js";
+import getClientDb from "../../middlewares/getClientDb.js";
+import verifyTokenAdmin from "../../middlewares/verifyTokenAdmin.js";
+
 // import { isLogged } from "../../middlewares/isLogged.js";
 // import { isAdmin } from "../../middlewares/isAdmin.js";
 
@@ -14,10 +18,14 @@ const v1OrderRouterStore = new Router()
 // v1OrderRouter.get('/payment/success', orderController.getSuccessController)
 // v1OrderRouter.get('/payment/failure', orderController.getFailureController)
 // v1OrderRouter.get('/:id', orderController.getStatusOrderById)
+v1OrderRouter.get('/', verifyTokenAdmin, getClientDb, orderController.getOrders)
 
 // ROUTER ORDER STORE
-v1OrderRouterStore.post('/payment', verifySubdomain, orderController.createPaymentMpStore)
+v1OrderRouterStore.post('/create-payment', verifySubdomain, orderController.createPaymentMpStore)
+v1OrderRouterStore.post('/notification-mp', getClientDbMetadata, orderController.getNotificationMpStore)
+
 
 export {
-    v1OrderRouterStore
+    v1OrderRouterStore,
+    v1OrderRouter
 }

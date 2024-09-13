@@ -1,12 +1,14 @@
 class ShipmentDelivery {
     #id
     #province
-    #shipingCost
+    #shipmentCost
+    #shipmentType
 
-    constructor({ id, province, shipingCost }){
+    constructor({ id, province, shipmentCost, shipmentType }){
         this.setId(id)
         this.setProvince(province)
-        this.setShipingCost(shipingCost)
+        this.setShipmentCost(shipmentCost)
+        this.setShipmentType(shipmentType)
     }
 
     // getter y setter ID
@@ -24,18 +26,26 @@ class ShipmentDelivery {
     getProvince() { return this.#province }
 
     // getter y setter SHIPING COST
-    setShipingCost(shipingCost) {
-        if(!shipingCost || typeof shipingCost !== 'number') throw { msg: "SHIPING COST es requerido" }
-        this.#shipingCost = shipingCost
+    setShipmentCost(shipmentCost) {
+        if(!shipmentCost || typeof shipmentCost !== 'number') throw { msg: "SHIPMENT COST es requerido" }
+        this.#shipmentCost = shipmentCost
     }
-    getShipingCost() { return this.#shipingCost }
+    getShipmentCost() { return this.#shipmentCost }
+
+    // getter y setter SHIPMENT TYPE
+    setShipmentType(shipmentType) {
+        if (!shipmentType || shipmentType === undefined || shipmentType === "" || shipmentType.length == 0 || shipmentType.trim() == "") throw { msg: "SHIPMENT TYPE es requerida" }
+        this.#shipmentType = shipmentType
+    }
+    getShipmentType() { return this.#shipmentType }
 
     // DTO
     convertToDTO() {
         return Object.freeze({
             id: this.#id,
             province: this.#province,
-            shipingCost: this.#shipingCost
+            shipmentCost: this.#shipmentCost,
+            shipmentType: this.#shipmentType,
         })
     }
 }

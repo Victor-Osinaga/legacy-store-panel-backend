@@ -135,7 +135,7 @@ export default class ProductMongo {
     // devuelve un array de objetos aunq tenga un solo objeto
     async getProductsStore() {
         try {
-            console.log("getProductsStore", await this.collection.find({}, { _id: 0, __v: 0 }).lean());
+            // console.log("CONTAINER : getProductsStore", await this.collection.find({}, { _id: 0, __v: 0 }).lean());
             return await this.collection.find({}, { _id: 0, __v: 0 }).lean();
         } catch (error) {
             console.log("desde container : getProductsStore", error);

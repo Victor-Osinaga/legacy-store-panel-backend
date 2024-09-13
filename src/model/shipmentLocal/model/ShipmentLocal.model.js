@@ -5,16 +5,18 @@ class ShimpmentLocal {
     #postalCode
     #streetName
     #streetNumber
-    #shipingCost
+    #shipmentCost
+    #shipmentType
 
-    constructor({ id, province, locality, postalCode, streetName, streetNumber, shipingCost }) {
+    constructor({ id, province, locality, postalCode, streetName, streetNumber, shipmentCost, shipmentType }) {
         this.setId(id)
         this.setProvince(province)
         this.setLocality(locality)
         this.setPostalCode(postalCode)
         this.setStreetName(streetName)
         this.setStreetNumber(streetNumber)
-        this.setShipingCost(shipingCost)
+        this.setShipmentCost(shipmentCost)
+        this.setShipmentType(shipmentType)
     }
 
     // getter y setter ID
@@ -59,12 +61,20 @@ class ShimpmentLocal {
     }
     getStreetNumber() { return this.#streetName }
 
-    // getter y setter SHIPING COST
-    setShipingCost(shipingCost) {
-        if (shipingCost === '' || shipingCost == null || shipingCost == undefined || typeof shipingCost !== 'number') throw { msg: "SHIPING COST es requerido" }
-        this.#shipingCost = shipingCost
+    // getter y setter SHIPMENT COST
+    setShipmentCost(shipmentCost) {
+        if (shipmentCost === '' || shipmentCost == null || shipmentCost == undefined || typeof shipmentCost !== 'number') throw { msg: "SHIPMENT COST es requerido" }
+        this.#shipmentCost = shipmentCost
     }
-    getShipingCost() { return this.#shipingCost }
+    getShipmentCost() { return this.#shipmentCost }
+
+    // getter y setter SHIPMENT TYPE
+    setShipmentType(shipmentType) {
+        if (!shipmentType || shipmentType === undefined || shipmentType === "" || shipmentType.length == 0 || shipmentType.trim() == "") throw { msg: "SHIPMENT TYPE es requerida" }
+        this.#shipmentType = shipmentType
+    }
+    getShipmentType() { return this.#shipmentType }
+
 
     // DTO
     convertToDTO() {
@@ -75,7 +85,8 @@ class ShimpmentLocal {
             postalCode: this.#postalCode,
             streetName: this.#streetName,
             streetNumber: this.#streetNumber,
-            shipingCost: this.#shipingCost,
+            shipmentCost: this.#shipmentCost,
+            shipmentType: this.#shipmentType
         })
     }
 }

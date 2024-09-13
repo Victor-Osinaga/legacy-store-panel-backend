@@ -1,7 +1,7 @@
 import {categoryServiceFactory} from '../../service/category/category.factory.js'
 
 const getCategories = async (req, res) => {
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const categoryService = await categoryServiceFactory(dbname)
         const categories = await categoryService.getCategories();
@@ -12,7 +12,7 @@ const getCategories = async (req, res) => {
 }
 
 const createCategory = async (req, res) => {
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const categoryService = await categoryServiceFactory(dbname)
         const category = await categoryService.createCategory(req.body);
@@ -33,7 +33,7 @@ const createCategory = async (req, res) => {
 // }
 
 const deleteCategoryById = async (req, res) => {
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const categoryService = await categoryServiceFactory(dbname)
         const category = await categoryService.deleteCategoryById(req.params.id, dbname);
@@ -46,7 +46,7 @@ const deleteCategoryById = async (req, res) => {
 // CONTROLLERS CATEGORY API STORE
 
 const getCategoriesStore = async (req, res) => {
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const categoryService = await categoryServiceFactory(dbname)
         const categories = await categoryService.getCategoriesStore();

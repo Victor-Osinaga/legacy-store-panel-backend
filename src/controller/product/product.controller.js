@@ -2,7 +2,7 @@ import config from '../../../config.js';
 import {productServiceFactory} from '../../service/product/product.factory.js'
 
 const getProducts = async (req, res) => {
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const productService = await productServiceFactory(dbname)
         const products = await productService.getProducts();
@@ -13,7 +13,7 @@ const getProducts = async (req, res) => {
 }
 
 const createProduct = async (req, res) => {
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const productService = await productServiceFactory(dbname)
         const product = await productService.createProduct(req.body, dbname);
@@ -25,7 +25,7 @@ const createProduct = async (req, res) => {
 }
 
 const getProductById = async (req, res) => {
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const productService = await productServiceFactory(dbname)
         const product = await productService.getProductById(req.params.id);
@@ -36,7 +36,7 @@ const getProductById = async (req, res) => {
 }
 
 const deleteProductById = async (req, res) => {
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const productService = await productServiceFactory(dbname)
         const deletedProduct = await productService.deleteProductById(req.params.id);
@@ -49,7 +49,7 @@ const deleteProductById = async (req, res) => {
 
 const updateProductById = async (req, res) => {
     // console.log("desde update", req.body);
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const productService = await productServiceFactory(dbname)
         const updatedProduct = await productService.updateProductById(req.params.id, req.body, dbname);
@@ -62,7 +62,7 @@ const updateProductById = async (req, res) => {
 // CONTROLLERS PRODUCT API STORE
 
 const getProductsStore = async (req, res) => {
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const productService = await productServiceFactory(dbname)
         const products = await productService.getProductsStore();
@@ -73,7 +73,7 @@ const getProductsStore = async (req, res) => {
 }
 
 const getProductStoreById = async (req, res) => {
-    const dbname = req.subdomain
+    const dbname = req.proyectName
     try {
         const productService = await productServiceFactory(dbname)
         const productById = await productService.getProductStoreById(req.params.id);
