@@ -11,6 +11,8 @@ import verifyTokenAdmin from "../../middlewares/verifyTokenAdmin.js";
 const v1OrderRouter = new Router()
 const v1OrderRouterStore = new Router()
 
+// ROUTER ORDER PANEL
+
 // v1OrderRouter.post('/', orderController.createOrder)
 // v1OrderRouter.post('/payment', orderController.createPaymentMP)
 // v1OrderRouter.get('/', isLogged, isAdmin, orderController.getOrders)
@@ -19,6 +21,7 @@ const v1OrderRouterStore = new Router()
 // v1OrderRouter.get('/payment/failure', orderController.getFailureController)
 // v1OrderRouter.get('/:id', orderController.getStatusOrderById)
 v1OrderRouter.get('/', verifyTokenAdmin, getClientDb, orderController.getOrders)
+v1OrderRouter.delete('/:id', verifyTokenAdmin, getClientDb, orderController.deleteOrderById)
 
 // ROUTER ORDER STORE
 v1OrderRouterStore.post('/create-payment', verifySubdomain, orderController.createPaymentMpStore)

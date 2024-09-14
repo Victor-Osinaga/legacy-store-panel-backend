@@ -48,4 +48,11 @@ export default class OrderMongo{
     async getOrderById(external_reference) {
         return await this.collection.findOne({ id: external_reference }, { _id: 0, __v: 0 }).lean();
     }
+
+    async deleteOrderById(id) {
+        const deletedOrder = await this.collection.deleteOne({ id: id }, { _id: 0, __v: 0 }).lean();
+        console.log("desde container deletedOrder", deletedOrder);
+        
+        return deletedOrder
+    }
 }

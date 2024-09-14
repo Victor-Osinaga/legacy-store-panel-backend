@@ -637,6 +637,19 @@ class OrderService {
             throw error
         }
     }
+
+    async deleteOrderById(id) {
+        try {
+            const orderNoDto = await this.orderRepository.repoGetOrderById(id)
+            if(!orderNoDto) throw {msg: "No se encontro una orden con ese ID", status: 404}
+
+            const deletedOrder = await this.orderRepository.repoDeleteOrderById(id)
+            return deletedOrder
+        } catch (error) {
+            console.log("desde order service", error);
+            throw error
+        }
+    }
 }
 
 export {

@@ -35,6 +35,17 @@ const createPaymentMpStore = async (req, res) => {
     }
 }
 
+const deleteOrderById = async (req, res) => {
+    const dbname = req.proyectName
+    try {
+        const orderService = await orderServiceFactory(dbname)
+        const deletedOrder = await orderService.deleteOrderById(req.params.id)
+        res.status(200).json({status: "ok", data: deletedOrder})
+    } catch (error) {
+        console.log("error desde controller : deleteOrderById");
+        res.status(500).json({status: "failed", data: error.msg})
+    }
+}
 
 
 // const getStatusOrderById = async (req, res) => {
@@ -96,5 +107,6 @@ export {
     getOrders,
     // getStatusOrderById,
     createPaymentMpStore,
-    getNotificationMpStore
+    getNotificationMpStore,
+    deleteOrderById
 }
