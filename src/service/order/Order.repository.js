@@ -42,6 +42,26 @@ class OrderRepository{
             throw error
         }
     }
+
+    async repoPutOrderStatusById(id, newOrder){
+        try {
+            const updatedOrder = await this.dao.putOrderStatusById(id, newOrder)
+            return updatedOrder
+        } catch (error) {
+            console.log("desde order repository", error);
+            throw error
+        }
+    }
+
+    async repoGetOrderStatusById(orderId){
+        try {
+            const orderStatusById = await this.dao.getOrderStatusById(orderId)
+            return orderStatusById
+        } catch (error) {
+            console.log("desde order repository", error);
+            throw error
+        }
+    }
 }
 
 export {

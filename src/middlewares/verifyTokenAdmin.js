@@ -4,6 +4,8 @@ import config from '../../config.js';
 const PRIVATE_KEY = config.private_key_jwt;
 
 export default function verifyTokenAdmin (req, res, next) {
+    console.log("req.headers.origin desde verifyTokenAdmin", req.headers.origin);
+    
     const {access_token} = req.cookies;
     console.log("access_token desde midleware verifyToken admin", access_token);
 

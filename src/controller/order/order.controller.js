@@ -47,6 +47,20 @@ const deleteOrderById = async (req, res) => {
     }
 }
 
+const putOrderStatusById = async (req, res) => {
+    console.log("desde controller bodyyy", req.body);
+    
+    const dbname = req.proyectName
+    try {
+        const orderService = await orderServiceFactory(dbname)
+        const updatedOrderStatus = await orderService.putOrderStatusById(req.params.id, req.body)
+        res.status(200).json({status: "ok", data: updatedOrderStatus})
+    } catch (error) {
+        console.log("error desde controller : putOrderStatusById");
+        res.status(500).json({status: "failed", data: error.msg})
+    }
+}
+
 
 // const getStatusOrderById = async (req, res) => {
 //     try {
@@ -83,6 +97,18 @@ const getNotificationMpStore = async (req, res) => {
     }
 }
 
+const getOrderStatusById = async (req, res) => {
+    const dbname = req.proyectName
+    try {
+        const orderService = await orderServiceFactory(dbname)
+        const orderStatus = await orderService.getOrderStatusById(req.params.orderId)
+        res.status(200).json({status: "ok", data: orderStatus})
+    } catch (error) {
+        console.log("error desde controller : getOrderStatus");
+        res.status(500).json({status: "failed", data: error.msg})
+    }
+}
+
 // const getSuccessController = async (req, res) => {
 //     try {
 //         res.send(`<h1>SUCCESS</h1>`)
@@ -108,5 +134,7 @@ export {
     // getStatusOrderById,
     createPaymentMpStore,
     getNotificationMpStore,
-    deleteOrderById
+    deleteOrderById,
+    putOrderStatusById,
+    getOrderStatusById
 }

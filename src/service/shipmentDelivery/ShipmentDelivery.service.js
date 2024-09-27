@@ -54,6 +54,18 @@ class ShipmentDeliveryService {
         }
     }
 
+    async getShipmentDeliveryById(id) {
+        try {
+            const shipmentDeliveryNoDto = await this.shipmentDeliveryRepository.repoGetShipmentDeliverylById(id)
+            if(!shipmentDeliveryNoDto) throw {msg: "No se encontro una provincia con ese ID", status: 404}
+
+            return shipmentDeliveryNoDto
+        } catch (error) {
+            console.log("desde ShipmentDeliveryService : deleteShipmentDeliveryById", error);
+            throw error
+        }
+    }
+
     async updateShipmentDeliveryById(idShipmentDelivery, body) {
         try {
             const shipmentDeliveryNoDto = await this.shipmentDeliveryRepository.repoGetShipmentDeliverylById(idShipmentDelivery);

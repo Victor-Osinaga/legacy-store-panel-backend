@@ -68,7 +68,7 @@ export default class StoreConfigurationMongo {
                 $set: {
                     id: idConfig,
                     storeConfigName: newData.storeConfigName,
-                    primaryColorStore: newData.primaryColorStore
+                    colors: newData.colors
                 },
             }
         );

@@ -7,6 +7,7 @@ import { calcPriceWithZip } from '../../utils/calculateCost/envios.js';
 import fs from 'fs'
 import { Product } from '../../model/product/model/Product.model.js';
 import { shipmentLocalServiceFactory } from '../shipmentLocal/shipmentLocal.factory.js';
+import { shipmentDeliveryServiceFactory } from '../shipmentDelivery/shipmentDelivery.factory.js';
 
 class OrderService {
     constructor(repository) {
@@ -71,7 +72,7 @@ class OrderService {
                     }
                 },
                 back_urls: {
-                    success: config.success_url_mp,
+                    // success: config.success_url_mp,
                     failure: config.failure_url_mp,
                 },
                 payment_methods: {
@@ -123,7 +124,7 @@ class OrderService {
 
                 // VERIFY SHIPMENT LOCAL
                 const shipmentLocalService = await shipmentLocalServiceFactory(dbname)
-                const findShipmentLocal = await shipmentLocalService.getShipmentLocalById(data.shipment.shipmentLocalId)
+                const findShipmentLocal = await shipmentLocalService.getShipmentLocalById(data.shipment.shipmentId)
                 console.log("findShipmentLocal", findShipmentLocal);
 
                 // VERIFY PRODUCTS AND STOCK
@@ -170,22 +171,10 @@ class OrderService {
                     }
                 }
 
-                // SHIPMENT INFO METADATA
-                // const shipmentInfoMetadata = {
-                //     zip_code: findShipmentLocal.postalCode,
-                //     state_name: findShipmentLocal.province,
-                //     city_name: findShipmentLocal.locality,
-                //     street_name: findShipmentLocal.streetName,
-                //     street_number: parseInt(findShipmentLocal.streetNumber),
-                // }
-
-                // NUMBER BLOCK 1
-
                 mercadopago.configure({
                     access_token: config.access_token_mp,
                 })
 
-                // console.log("nombre y id", data.shipments.receiver_address.state_name, data.shipments.receiver_address.state_id)
                 let preference = {
                     items: verifyProducts,
                     payer: {
@@ -197,17 +186,16 @@ class OrderService {
                             number: parseInt(data.payer.numberPhone)
                         },
                         address: {
-                            // street_name: data.payer.address.street_name,
-                            // street_number: parseInt(data.payer.address.street_number),
-                            // zip_code: data.payer.address.zip_code
                             street_name: findShipmentLocal.streetName,
                             street_number: parseInt(findShipmentLocal.streetNumber),
                             zip_code: findShipmentLocal.postalCode
                         }
                     },
                     back_urls: {
-                        success: config.success_url_mp,
-                        failure: config.failure_url_mp,
+                        // success: config.success_url_mp,
+                        // failure: config.failure_url_mp,
+                        success: `${req.headers.origin}/orden/completa`,
+                        failure: `${req.headers.origin}/orden/completa`,
                     },
                     payment_methods: {
                         excluded_payment_types: [
@@ -231,7 +219,6 @@ class OrderService {
                             street_name: findShipmentLocal.streetName,
                             street_number: parseInt(findShipmentLocal.streetNumber),
                         },
-                        // cost: calcPriceWithZip(pesoTotalEnGramos, data.shipments.receiver_address.state_id),
                         cost: findShipmentLocal.shipmentCost,
                         mode: "not_specified"
                     },
@@ -239,13 +226,11 @@ class OrderService {
                     statement_descriptor: req.clientInfo.subdomain,
                     external_reference: uuidv4(),
                 };
-                // _______________________
 
                 try {
                     const response = await mercadopago.preferences.create(preference)
 
                     console.log("____________________________________________________");
-                    // console.log("respuesta de mercadopago.preferences.create(preference)", response.body);
                     console.log("____________________________________________________");
                     console.log("SHIPMENTS", response.body.shipments);
                     console.log("____________________________________________________");
@@ -274,8 +259,6 @@ class OrderService {
                     }
                 } catch (error) {
                     console.log("errrrrrr", error);
-
-
                     // console.log("error desde seg try catch ", error);
                     // console.log("get OWN ", Object.getOwnPropertyNames(error)); // Lista las propiedades del objeto de error
                     // console.log("ERR NAME ", error.name);
@@ -289,50 +272,166 @@ class OrderService {
                     }
                 }
 
+            } else if (data.shipment.shipmentType == "shipment_delivery") {
+                console.log("shipment_delivery", data);
+
+                // VERIFY SHIPMENT LOCAL
+                const shipmentDeliveryService = await shipmentDeliveryServiceFactory(dbname)
+                const findShipmentDelivery = await shipmentDeliveryService.getShipmentDeliveryById(data.shipment.shipmentId)
+                console.log("findShipmentDelivery", findShipmentDelivery);
+
+                // VERIFY PRODUCTS AND STOCK
+                let productsMetadata = []
+                const verifyProducts = await Promise.all(data.products.map(async prod => {
+                    const productsService = await productServiceFactory(dbname)
+                    const findProduct = await productsService.getProductById(prod.id)
+                    productsMetadata.push({
+                        // DATA PRODUCT
+                        id: findProduct.id,
+                        name: findProduct.name,
+                        price: findProduct.price,
+                        image: findProduct.image,
+                        timestamp: findProduct.timestamp,
+                        quantity: prod.quantity,
+
+                        // SIZE SELECTED
+                        selectedSizeId: prod.selectedSizeId,
+                        selectedSizeName: prod.selectedSizeName,
+
+                        // COLOR SELECTED
+                        selectedColorId: prod.selectedColorId,
+                        selectedColorName: prod.selectedColorName
+                    })
+                    return {
+                        id: findProduct.id,
+                        title: findProduct.name,
+                        quantity: prod.quantity,
+                        unit_price: findProduct.price,
+                        currency_id: 'ARS',
+                        picture_url: findProduct.image
+                    }
+                }))
+                console.log("verifyProducts", verifyProducts);
+
+                // INFO CLIENT
+                const clientInfoContact = {
+                    name: data.payer.name,
+                    surname: data.payer.surname,
+                    email: data.payer.email,
+                    phone: {
+                        areaCode: data.payer.areaCode,
+                        number: parseInt(data.payer.numberPhone)
+                    }
+                }
+
+                mercadopago.configure({
+                    access_token: config.access_token_mp,
+                })
+
+                let preference = {
+                    items: verifyProducts,
+                    payer: {
+                        name: data.payer.name,
+                        surname: data.payer.surname,
+                        email: data.payer.email,
+                        phone: {
+                            area_code: data.payer.areaCode,
+                            number: parseInt(data.payer.numberPhone)
+                        },
+                        address: {
+                            street_name: data.shipment.receiverAddress.streetName,
+                            street_number: parseInt(data.shipment.receiverAddress.streetNumber),
+                            zip_code: data.shipment.receiverAddress.zipCode,
+                        }
+                    },
+                    back_urls: {
+                        // success: config.success_url_mp,
+                        // failure: config.failure_url_mp,
+                        success: `${req.headers.origin}/orden/completa`,
+                        failure: `${req.headers.origin}/orden/completa`,
+                    },
+                    payment_methods: {
+                        excluded_payment_types: [
+                            {
+                                id: "ticket"
+                            }
+                        ],
+                        installments: 12
+                    },
+                    metadata: {
+                        proyect_name: req.clientInfo.proyectName,
+                        products: productsMetadata,
+                        client_info_contact: clientInfoContact,
+                        shipment_info: {
+                            postal_code: data.shipment.receiverAddress.zipCode,
+                            locality: data.shipment.receiverAddress.cityName,
+                            street_name: data.shipment.receiverAddress.streetName,
+                            street_number: data.shipment.receiverAddress.streetNumber,
+
+                            ...findShipmentDelivery
+                        }
+                    },
+                    shipments: {
+                        receiver_address: {
+                            zip_code: data.shipment.receiverAddress.zipCode,
+                            state_name: findShipmentDelivery.province,
+                            city_name: data.shipment.receiverAddress.cityName,
+                            street_name: data.shipment.receiverAddress.streetName,
+                            street_number: parseInt(data.shipment.receiverAddress.streetNumber),
+                        },
+                        cost: findShipmentDelivery.shipmentCost,
+                        mode: "not_specified"
+                    },
+                    notification_url: config.notification_url_mp,
+                    statement_descriptor: req.clientInfo.subdomain,
+                    external_reference: uuidv4(),
+                };
+
+                try {
+                    const response = await mercadopago.preferences.create(preference)
+
+                    console.log("____________________________________________________");
+                    console.log("____________________________________________________");
+                    console.log("SHIPMENTS", response.body.shipments);
+                    console.log("____________________________________________________");
+                    console.log("PAYER", response.body.payer);
+
+                    const body = response.body
+                    const { zip_code, street_name, street_number, city_name, state_name, ...rest } = response.body.shipments.receiver_address
+                    return {
+                        init_point: body.init_point,
+                        shipments: {
+                            cost: body.shipments.cost,
+                            zip_code,
+                            street_name,
+                            street_number,
+                            city_name,
+                            state_name
+                        },
+                        payer: {
+                            name: response.body.payer.name,
+                            surname: response.body.payer.surname,
+                            email: response.body.payer.email,
+                            area_code: response.body.payer.phone.area_code,
+                            number_phone: response.body.payer.phone.number
+                        },
+                        externalReference: body.external_reference
+                    }
+                } catch (error) {
+                    console.log("errrrrrr", error);
+                    // console.log("error desde seg try catch ", error);
+                    // console.log("get OWN ", Object.getOwnPropertyNames(error)); // Lista las propiedades del objeto de error
+                    // console.log("ERR NAME ", error.name);
+                    // console.log("ERR MESSA ", error.message);
+                    // console.log("ERR CAUSE ", error.cause);
+                    // console.log("ERR STATUS ", error.status);
+                    // console.log("ERR IDEMPOTENCY ", error.idempotency);
+                    // console.log("ERR STACK ", error.stack);
+                    if (error.status == 400) {
+                        throw { msg: "Error al crear la orden de pago", status: 400 }
+                    }
+                }
             }
-            // const productsMP = await Promise.all(data.products.map(async (product) => {
-            //     const findPorduct = await productService.getProductById(product.id)
-            //     if (!findPorduct) { throw { msg: "No se encontro ese productoooooo" } }
-            //     return {
-            //         id: findPorduct.id,
-            //         title: findPorduct.name,
-            //         category_id: findPorduct.categories[0].categoria.name,
-            //         description: findPorduct.description,
-            //         quantity: product.quantity,
-            //         unit_price: findPorduct.price,
-            //         currency_id: 'ARS',
-            //         // picture_url: findPorduct.image
-            //     }
-            // }))
-
-            // console.log(productsMP);
-
-            // _____________________________________________________________________________
-
-            // const productsMetaData = await Promise.all(data.products.map(async (product) => {
-            //     const findProduct = await productService.getProductById(product.id)
-            //     if (!findProduct) { throw { msg: "No se encontro ese producto" } }
-            //     return {
-            //         id: findProduct.id,
-            //         size: product.size,
-            //         color: product.color,
-            //         quantity: product.quantity
-            //     }
-            // }))
-
-            // _____________________________________________________________________________
-
-            // let pesoTotalEnGramos = 0;
-            // const pesoProductos = await Promise.all(data.products.map(async (product) => {
-            //     const findProduct = await productService.getProductById(product.id)
-            //     if (!findProduct) { throw { msg: "No se encontro ese producto" } }
-            //     pesoTotalEnGramos = pesoTotalEnGramos + (findProduct.pesoGramos * product.quantity)
-            // }))
-            // console.log("Peso total", pesoTotalEnGramos);
-
-            // _____________________________________________________________________________
-
-            // NUMBER BLOCK 1
 
         } catch (error) {
             console.log("desde order service create payment MP", error);
@@ -342,30 +441,16 @@ class OrderService {
 
     async getNotificationMpStore(req) {
         try {
-            // console.log("req desde : getNotificationMpStore ", req);
-            // const { query } = req
-            // const topic = query.topic || query.type;
 
             const query = req.query
 
             let payment;
-            // if (topic == "payment") {
-            //     console.log("query: ", query);
-            //     console.log("topic payment: ", topic);
-            //     const paymentId = query.id || query["data.id"]
-            //     payment = await mercadopago.payment.findById(paymentId)
-            //     return true
-            // } else if (topic == "merchant_order") {
-            //     console.log("query: ", query);
-            //     console.log("topic merchant_order: ", topic);
-            //     return true
-            // }
 
             if (query.type == "payment") {
                 console.log("queryyyy ", query);
                 const paymentId = query["data.id"]
                 console.log("paymentId", paymentId);
-                
+
                 payment = await mercadopago.payment.findById(paymentId)
                 // console.log("payment encontrado: ", payment);
                 if (payment.body.status == "approved") {
@@ -399,9 +484,9 @@ class OrderService {
 
                     const orderDto = new Order(order)
                     const createdOrder = await this.orderRepository.repoCreateOrder(orderDto.convertToDTO())
-                    
-                    console.log("CREATED ORDERRRR",createdOrder);
-                    
+
+                    console.log("CREATED ORDERRRR", createdOrder);
+
 
                     console.log("orderrrr", order);
                     console.log("payment.body.fee_details", payment.body.fee_details);
@@ -411,19 +496,77 @@ class OrderService {
                     console.log("payment.body.additional_info.payer.address", payment.body.additional_info.payer.address);
                     console.log("payment.body.additional_info.payer.phone", payment.body.additional_info.payer.phone);
                     console.log("payment.body.metadata", payment.body.metadata);
+                    console.log("payment.body.metadata.products", payment.body.metadata.products);
                     console.log("-----------------------------------------------------------",);
+
+                    const promises = payment.body.metadata.products.map(async (element) => {
+                        try {
+                            const dbname = payment.body.metadata.proyect_name;
+                            const productServices = await productServiceFactory(dbname);
+                            
+                            // Obtener el producto por su ID
+                            const findProduct = await productServices.getProductById(element.id);
+                            const { sizes, categories, ...rest } = findProduct;
+                    
+                            // Función para actualizar el stock
+                            function updateStock(sizes, sizeId, colorId, quantity) {
+                                // Buscar el tamaño por id
+                                const size = sizes.find(s => s.id === sizeId);
+                    
+                                if (!size) {
+                                    return "Tamaño no encontrado";
+                                }
+                    
+                                // Buscar el color por id dentro del tamaño encontrado
+                                const color = size.colors.find(c => c.id === colorId);
+                    
+                                if (!color) {
+                                    return "Color no encontrado";
+                                }
+                    
+                                // Verificar que haya suficiente stock para restar
+                                if (color.stock < quantity) {
+                                    return "No hay suficiente stock disponible";
+                                }
+                    
+                                // Restar la cantidad del stock actual
+                                color.stock -= quantity;
+                    
+                                return sizes;
+                            }
+                    
+                            // Acumular todas las actualizaciones de stock antes de realizar la operación de base de datos
+                            payment.body.metadata.products.forEach(product => {
+                                updateStock(findProduct.sizes, product.selected_size_id, product.selected_color_id, product.quantity);
+                            });
+                    
+                            // Crear el nuevo producto con el stock actualizado
+                            const newProduct = {
+                                sizes: JSON.stringify(findProduct.sizes), // Aquí ya se actualizó para todos
+                                categories: JSON.stringify(categories),
+                                ...rest
+                            };
+                    
+                            // Actualizar el producto en la base de datos
+                            const updatedProduct = await productServices.updateProductById(findProduct.id, newProduct, dbname);
+                            console.log("Producto actualizado de stock", updatedProduct);
+                    
+                        } catch (error) {
+                            console.log("EL ERROR", error);
+                        }
+                    });
 
                     return true
 
 
-                }else{
+                } else {
                     return false
                 }
-                
-            }else{
+
+            } else {
                 return false
             }
-            
+
         } catch (error) {
             console.log("desde order : getNotificationMpStore", error);
             throw error
@@ -641,12 +784,56 @@ class OrderService {
     async deleteOrderById(id) {
         try {
             const orderNoDto = await this.orderRepository.repoGetOrderById(id)
-            if(!orderNoDto) throw {msg: "No se encontro una orden con ese ID", status: 404}
+            if (!orderNoDto) throw { msg: "No se encontro una orden con ese ID", status: 404 }
 
             const deletedOrder = await this.orderRepository.repoDeleteOrderById(id)
             return deletedOrder
         } catch (error) {
             console.log("desde order service", error);
+            throw error
+        }
+    }
+
+    async putOrderStatusById(id, body) {
+        console.log("VODYYYY", body);
+
+        try {
+            const orderNoDto = await this.orderRepository.repoGetOrderById(id)
+            if (!orderNoDto) throw { msg: "No se encontro una orden con ese ID", status: 404 }
+
+            const possibleValues = ["pendiente", "procesado", "listo", "enviado/retirado"]
+            const { order_status } = body
+            if (!order_status) throw { msg: "ORDER_STATUS es requerido", status: 404 }
+
+            const findValue = possibleValues.find(v => v == order_status)
+            if (!findValue) throw { msg: "ORDER_STATUS no admintido", status: 404 }
+
+            const newOrder = new Order({
+                ...orderNoDto,
+                order_status
+            })
+
+            const updatedOrder = await this.orderRepository.repoPutOrderStatusById(id, newOrder.convertToDTO())
+            return updatedOrder
+
+        } catch (error) {
+            console.log("desde order service", error);
+            throw error
+        }
+    }
+
+    async getOrderStatusById(orderId) {
+        try {
+            const orderNoDto = await this.orderRepository.repoGetOrderStatusById(orderId)
+            if (!orderNoDto) throw { msg: "No se encontro una orden con ese ID", status: 404 }
+            const {order_status, shipment_info, id} = orderNoDto
+            return {
+                id,
+                order_status,
+                shipment_type: shipment_info.shipment_type
+            }
+        } catch (error) {
+            console.log("desde order service : getOrderStatus", error);
             throw error
         }
     }

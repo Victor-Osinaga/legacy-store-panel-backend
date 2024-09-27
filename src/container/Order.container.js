@@ -55,4 +55,20 @@ export default class OrderMongo{
         
         return deletedOrder
     }
+
+    async putOrderStatusById(id, newOrder){
+        const update = await this.collection.updateOne(
+            {id: id},
+            {
+                $set: {
+                    ...newOrder
+                }
+            }
+        )
+        return await this.collection.findOne({ id: id }, { _id: 0, __v: 0 }).lean();
+    }
+
+    async getOrderStatusById(orderId){
+        return await this.collection.findOne({ id: orderId }, { _id: 0, __v: 0 }).lean();
+    }
 }

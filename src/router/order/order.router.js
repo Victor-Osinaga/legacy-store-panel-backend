@@ -22,10 +22,12 @@ const v1OrderRouterStore = new Router()
 // v1OrderRouter.get('/:id', orderController.getStatusOrderById)
 v1OrderRouter.get('/', verifyTokenAdmin, getClientDb, orderController.getOrders)
 v1OrderRouter.delete('/:id', verifyTokenAdmin, getClientDb, orderController.deleteOrderById)
+v1OrderRouter.put('/update-status/:id', verifyTokenAdmin, getClientDb, orderController.putOrderStatusById)
 
 // ROUTER ORDER STORE
 v1OrderRouterStore.post('/create-payment', verifySubdomain, orderController.createPaymentMpStore)
 v1OrderRouterStore.post('/notification-mp', getClientDbMetadata, orderController.getNotificationMpStore)
+v1OrderRouterStore.get('/status/:orderId', verifySubdomain, orderController.getOrderStatusById)
 
 
 export {

@@ -1,5 +1,20 @@
 import { Schema } from "mongoose";
 
+const colorsSchema = new Schema({
+    primaryColorStore: {
+        type: String,
+        required: [true, "required: primaryColorStore : mongoose squema"]
+    },
+    secondaryColorStore: {
+        type: String,
+        required: [true, "required: secondaryColorStore : mongoose squema"]
+    },
+    tertiaryColorStore: {
+        type: String,
+        required: [true, "required: tertiaryColorStore : mongoose squema"]
+    },
+})
+
 const storeConfigurationSchema = new Schema({
     id: {
         type: String,
@@ -9,9 +24,10 @@ const storeConfigurationSchema = new Schema({
         type: String, 
         required: [true, "required: storeConfigName : mongoose squema"]
     },
-    primaryColorStore: {
-        type: String, 
-        required: [true, "required: primaryColorStore : mongoose squema"]
+    colors: {
+        type: colorsSchema, 
+        required: [true, "required: colors : mongoose squema"],
+        _id: false,
     },
 })
 

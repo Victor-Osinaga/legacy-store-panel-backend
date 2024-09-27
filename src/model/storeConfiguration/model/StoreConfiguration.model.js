@@ -1,12 +1,12 @@
 class StoreConfiguration {
     #id
     #storeConfigName
-    #primaryColorStore
+    #colors
 
-    constructor({id, storeConfigName, primaryColorStore}) {
+    constructor({id, storeConfigName, colors}) {
         this.setId(id)
         this.setStoreConfigName(storeConfigName)
-        this.setPrimaryColorStore(primaryColorStore)
+        this.setColors(colors)
     }
 
     // getter y setter ID
@@ -23,19 +23,19 @@ class StoreConfiguration {
     }
     getStoreConfigName(){return this.#storeConfigName}
 
-    // getter y setter NAME
-    setPrimaryColorStore(primaryColorStore){
-        if(!primaryColorStore || primaryColorStore === undefined || primaryColorStore === "" || primaryColorStore.length == 0 || primaryColorStore.trim() == "") throw {msg: "PRIMARY COLOR es requerida"}
-        this.#primaryColorStore = primaryColorStore
+    // getter y setter COLORS
+    setColors(colors){
+        if(!colors || typeof colors !== 'object' || Array.isArray(colors) || colors === null) throw {msg: "COLORS es requerida"}
+        this.#colors = colors
     }
-    getPrimaryColorStore(){return this.#primaryColorStore}
+    getColors(){return this.#colors}
 
     // DTO
     convertToDTO(){
         return Object.freeze({
             id: this.#id,
             storeConfigName: this.#storeConfigName,
-            primaryColorStore: this.#primaryColorStore,
+            colors: this.#colors,
         })
     }
 }

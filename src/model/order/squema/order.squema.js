@@ -147,7 +147,7 @@ const orderSchema = new Schema({
     order_status: {
         type: String,
         required: [true, "required: order_status order: mongoose squema"],
-        enum: ['pendiente', 'procesando', 'listo', 'retirado']
+        enum: ["pendiente", "procesado", "listo", "enviado/retirado"]
     },
     products: {
         type: [productOrderSchema],

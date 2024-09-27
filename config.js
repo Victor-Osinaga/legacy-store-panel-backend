@@ -25,8 +25,8 @@ const config = {
   prod_url2: process.env.PROD_URL2,
   // MERCADO PAGO ______________________________________________________________
   access_token_mp: process.env.ACCESS_TOKEN_MP,
-  success_url_mp: process.env.SUCCESS_URL_MP,
-  failure_url_mp: process.env.FAILURE_URL_MP,
+  // success_url_mp: process.env.SUCCESS_URL_MP,
+  // failure_url_mp: process.env.FAILURE_URL_MP,
   notification_url_mp: process.env.NOTIFICATION_URL_MP,
 
   // JWT ______________________________________________________________

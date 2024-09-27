@@ -17,8 +17,13 @@ class StoreConfigurationService {
 
             const configNoDto = new StoreConfiguration({
                 id: uuidv4(),
-                storeConfigName,
-                primaryColorStore
+                storeConfigName: body.storeConfigName,
+                colors: {
+                    primaryColorStore: body.colors.primaryColorStore,
+                    secondaryColorStore: body.colors.secondaryColorStore,
+                    tertiaryColorStore: body.colors.tertiaryColorStore,
+                }
+                // primaryColorStore
             })
 
             const createdStoreConfig = await this.storeConfigurationRepository.repoCreateStoreConfiguration(configNoDto.convertToDTO())
@@ -40,7 +45,12 @@ class StoreConfigurationService {
                 const configNoDto = new StoreConfiguration({
                     id: uuidv4(),
                     storeConfigName: "Default",
-                    primaryColorStore: "#1877f2"
+                    colors: {
+                        // primaryColorStore: "#1877f2",
+                        primaryColorStore: "#084c61",
+                        secondaryColorStore: "#2B2D38",
+                        tertiaryColorStore: "#23252F",
+                    }
                 })
 
                 const createdStoreConfig = await this.storeConfigurationRepository.repoCreateStoreConfiguration(configNoDto.convertToDTO())
@@ -63,8 +73,8 @@ class StoreConfigurationService {
 
             const configNoDto = new StoreConfiguration({
                 id: existConfig.id,
-                storeConfigName: body.storeConfigName,
-                primaryColorStore: body.primaryColorStore
+                storeConfigName: existConfig.storeConfigName,
+                colors: body.colors,
             })
 
             const createdStoreConfig = await this.storeConfigurationRepository.repoUpdateStoreConfiguration(existConfig.id, configNoDto.convertToDTO())
@@ -81,7 +91,7 @@ class StoreConfigurationService {
         try {
             const existConfig = await this.storeConfigurationRepository.repoGetStoreConfigurationStore();
             console.log("existConfig", existConfig);
-            
+
             return existConfig
         } catch (error) {
             console.log("desde store configuration service", error);
