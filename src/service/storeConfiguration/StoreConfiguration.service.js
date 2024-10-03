@@ -53,14 +53,14 @@ class StoreConfigurationService {
                     },
                     footerConfig: {
                         colors: {
-                            primaryColorFooter: "#000000"
+                            primaryColorFooter: "#2B2D38"
                         },
                         social: {
-                            instagram: "undefined",
-                            facebook: "undefined",
-                            gmail: "undefined",
-                            whatsapp: "undefined",
-                            storeAddress: "undefined"
+                            instagram: "https://www.instagram.com",
+                            facebook: "https://www.facebook.com",
+                            gmail: "test@test.com",
+                            whatsapp: "5492966605314",
+                            storeAddress: "Argentina - Salta - Av Siempre Viva 678"
                         }
                     }
                 })
@@ -76,14 +76,14 @@ class StoreConfigurationService {
                         ...existConfig,
                         footerConfig: {
                             colors: {
-                                primaryColorFooter: "#000000"
+                                primaryColorFooter: "#2B2D38"
                             },
                             social: {
-                                instagram: "undefined",
-                                facebook: "undefined",
-                                gmail: "undefined",
-                                whatsapp: "undefined",
-                                storeAddress: "undefined"
+                                instagram: "https://www.instagram.com",
+                                facebook: "https://www.facebook.com",
+                                gmail: "test@test.com",
+                                whatsapp: "5492966605314",
+                                storeAddress: "Argentina - Salta - Av Siempre Viva 678"
                             }
                         }
                     }
