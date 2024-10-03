@@ -15,6 +15,43 @@ const colorsSchema = new Schema({
     },
 })
 
+const footerConfigSquema = new Schema({
+    colors: {
+        primaryColorFooter: {
+            type: String,
+            required: [true, "required: primaryColorFooter-colors-footerConfigSquema : mongoose squema"],
+            default: '#000000'
+        }
+    },
+    social: {
+        instagram: {
+            type: String,
+            required: [true, "required: instagram-social-footerConfigSquema: mongoose squema"],
+            default: 'undefined'
+        },
+        facebook: {
+            type: String,
+            required: [true, "required: facebook-social-footerConfigSquema: mongoose squema"],
+            default: 'undefined'
+        },
+        gmail: {
+            type: String,
+            required: [true, "required: gmail-social-footerConfigSquema: mongoose squema"],
+            default: 'undefined'
+        },
+        whatsapp: {
+            type: String,
+            required: [true, "required: whatsapp-social-footerConfigSquema: mongoose squema"],
+            default: 'undefined'
+        },
+        storeAddress: {
+          type: String,
+          required: [true, "required: storeAddress-social-footerConfigSquema: mongoose squema"],
+          default: 'undefined'
+        }
+    }
+})
+
 const storeConfigurationSchema = new Schema({
     id: {
         type: String,
@@ -29,6 +66,11 @@ const storeConfigurationSchema = new Schema({
         required: [true, "required: colors : mongoose squema"],
         _id: false,
     },
+    footerConfig: {
+        type: footerConfigSquema,
+        required: [true, "required: footerConfig : mongoose squema"],
+        _id: false
+    }
 })
 
 export {

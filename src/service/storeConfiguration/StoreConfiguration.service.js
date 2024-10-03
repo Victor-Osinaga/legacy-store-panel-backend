@@ -50,12 +50,50 @@ class StoreConfigurationService {
                         primaryColorStore: "#084c61",
                         secondaryColorStore: "#2B2D38",
                         tertiaryColorStore: "#23252F",
+                    },
+                    footerConfig: {
+                        colors: {
+                            primaryColorFooter: "#000000"
+                        },
+                        social: {
+                            instagram: "undefined",
+                            facebook: "undefined",
+                            gmail: "undefined",
+                            whatsapp: "undefined",
+                            storeAddress: "undefined"
+                        }
                     }
                 })
 
                 const createdStoreConfig = await this.storeConfigurationRepository.repoCreateStoreConfiguration(configNoDto.convertToDTO())
                 return createdStoreConfig
             } else {
+                // console.log("DESDE getStoreConfiguration : SERVICES", existConfig);
+                // console.log("existConfig.footerConfig", existConfig.footerConfig);
+                
+                if(!existConfig.footerConfig){
+                    const newData = {
+                        ...existConfig,
+                        footerConfig: {
+                            colors: {
+                                primaryColorFooter: "#000000"
+                            },
+                            social: {
+                                instagram: "undefined",
+                                facebook: "undefined",
+                                gmail: "undefined",
+                                whatsapp: "undefined",
+                                storeAddress: "undefined"
+                            }
+                        }
+                    }
+
+                    // console.log("NEW DATA", newData);
+                    
+
+                    const updatedConfig = await this.storeConfigurationRepository.repoUpdateStoreConfiguration(existConfig.id, newData)
+                    return updatedConfig
+                }
                 return existConfig
             }
         } catch (error) {
@@ -74,7 +112,8 @@ class StoreConfigurationService {
             const configNoDto = new StoreConfiguration({
                 id: existConfig.id,
                 storeConfigName: existConfig.storeConfigName,
-                colors: body.colors,
+                // colors: body.colors,
+                ...body
             })
 
             const createdStoreConfig = await this.storeConfigurationRepository.repoUpdateStoreConfiguration(existConfig.id, configNoDto.convertToDTO())

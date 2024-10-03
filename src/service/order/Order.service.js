@@ -147,7 +147,8 @@ class OrderService {
 
                         // COLOR SELECTED
                         selectedColorId: prod.selectedColorId,
-                        selectedColorName: prod.selectedColorName
+                        selectedColorName: prod.selectedColorName,
+                        selectedColorValueHexa: prod.selectedColorValueHexa
                     })
                     return {
                         id: findProduct.id,
@@ -300,7 +301,8 @@ class OrderService {
 
                         // COLOR SELECTED
                         selectedColorId: prod.selectedColorId,
-                        selectedColorName: prod.selectedColorName
+                        selectedColorName: prod.selectedColorName,
+                        selectedColorValueHexa: prod.selectedColorValueHexa
                     })
                     return {
                         id: findProduct.id,

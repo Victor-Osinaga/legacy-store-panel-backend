@@ -30,6 +30,10 @@ const productOrderSchema = new Schema({
         type: String,
         required: [true, "required: selected_color_name productOrderSchema: mongoose squema"]
     },
+    selected_color_value_hexa: {
+        type: String,
+        required: [true, "required: selected_color_value_hexa productOrderSchema: mongoose squema"]
+    },
     selected_size_id: {
         type: String,
         required: [true, "required: selected_size_id productOrderSchema: mongoose squema"]

@@ -2,11 +2,13 @@ class StoreConfiguration {
     #id
     #storeConfigName
     #colors
+    #footerConfig
 
-    constructor({id, storeConfigName, colors}) {
+    constructor({id, storeConfigName, colors, footerConfig}) {
         this.setId(id)
         this.setStoreConfigName(storeConfigName)
         this.setColors(colors)
+        this.setFooterConfig(footerConfig)
     }
 
     // getter y setter ID
@@ -30,12 +32,20 @@ class StoreConfiguration {
     }
     getColors(){return this.#colors}
 
+    // getter y setter FOOTER CONFIG
+    setFooterConfig(footerConfig){
+        if(!footerConfig || typeof footerConfig !== 'object' || Array.isArray(footerConfig) || footerConfig === null) throw {msg: "FOOTER CONFIG es requerida"}
+        this.#footerConfig = footerConfig
+    }
+    getFooterConfig(){return this.#footerConfig}
+
     // DTO
     convertToDTO(){
         return Object.freeze({
             id: this.#id,
             storeConfigName: this.#storeConfigName,
             colors: this.#colors,
+            footerConfig: this.#footerConfig
         })
     }
 }
