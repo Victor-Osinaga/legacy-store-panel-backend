@@ -58,7 +58,7 @@ class Order {
 
     // getter y setter SHIPMENT COST
     setShipmentCost(shipment_cost){
-        if(!shipment_cost || typeof shipment_cost !== 'number') throw {msg: "SHIPMENT COST es requerido"}
+        if(shipment_cost === '' || shipment_cost === undefined || shipment_cost === null || typeof shipment_cost !== 'number') throw {msg: "SHIPMENT COST es requerido"}
         this.#shipment_cost = shipment_cost
     }
     getShipmentCost(){return this.#shipment_cost}
