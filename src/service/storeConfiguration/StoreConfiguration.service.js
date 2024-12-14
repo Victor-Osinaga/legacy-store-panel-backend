@@ -1,5 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 import { StoreConfiguration } from "../../model/storeConfiguration/model/StoreConfiguration.model.js";
+import firebase from "firebase-admin";
+import config from "../../../config.js";
+import firebaseInitializer from "../../utils/firebase/initializeFirebase.js";
+import getUrlBase from "../../utils/getUrlBase.js";
+import { fileURLToPath } from "url";
+import path from "path";
+import { existsSync } from "fs"; // Para verificar si existe el archivo localmente
 
 class StoreConfigurationService {
   constructor(repository) {
@@ -49,9 +56,76 @@ class StoreConfigurationService {
     try {
       const existConfig =
         await this.storeConfigurationRepository.repoGetStoreConfiguration();
-      // console.log("existConfig", existConfig);
 
-      // if(existConfig != null) throw { msg: "Ya existe una confiracion para tu tienda con este nombre", status: 400 }
+      // Obtener la ruta __dirname en módulos ES6
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = path.dirname(__filename);
+      // Ruta del archivo local que quieres subir
+      const localFilePath = path.join(
+        __dirname,
+        "../../../assets",
+        "logolegacy.svg"
+      ); // Nombre del archivo en Firebase Storage
+      const storageFilePath = "logolegacy.svg";
+      // Función para verificar si el archivo ya existe en Firebase Storage
+      const bucket = firebaseInitializer.storage().bucket();
+      const checkIfFileExistsInStorage = async (filePath) => {
+        try {
+          const file = bucket.file(filePath);
+          const [exists] = await file.exists();
+          return exists;
+        } catch (error) {
+          console.error(
+            "Error al verificar la existencia del archivo en Firebase Storage:",
+            error
+          );
+          return false;
+        }
+      };
+
+      const fileExists = await checkIfFileExistsInStorage(storageFilePath);
+      let logoLegacyUrlPublic;
+      if (fileExists) {
+        console.log("El archivo ya existe en Firebase Storage.");
+        const fileLogoLegacy = bucket.file("logolegacy.svg");
+        const [url] = await fileLogoLegacy.getSignedUrl({
+          action: "read",
+          expires: "03-09-2491",
+        });
+        const urlBase = getUrlBase(url);
+        console.log("url", url);
+        console.log("urlBase", urlBase);
+
+        logoLegacyUrlPublic = urlBase;
+      } else {
+        console.log("El archivo no existe en Firebase Storage");
+        if (!existsSync(localFilePath)) {
+          console.log(
+            "El archivo no existe en la ruta local especificada",
+            localFilePath
+          );
+          return;
+        } else {
+          console.log("El archivo si existe en la ruta local especificada");
+          // Subir el archivo si no existe en Firebase Storage
+          await bucket.upload(localFilePath, {
+            destination: storageFilePath,
+            public: true,
+          });
+          console.log("Archivo subido exitosamente a Firebase Storage!");
+          const fileLogoLegacy = bucket.file("logolegacy.svg");
+          const [url] = await fileLogoLegacy.getSignedUrl({
+            action: "read",
+            expires: "03-09-2491",
+          });
+          const urlBase = getUrlBase(url);
+          console.log("url", url);
+          console.log("urlBase", urlBase);
+
+          logoLegacyUrlPublic = urlBase;
+        }
+      }
+
       if (!existConfig) {
         const configNoDto = new StoreConfiguration({
           id: uuidv4(),
@@ -74,6 +148,9 @@ class StoreConfigurationService {
               storeAddress: "Argentina - Salta - Av Siempre Viva 678",
             },
           },
+          logoConfig: {
+            logoUrl: logoLegacyUrlPublic,
+          },
         });
 
         const createdStoreConfig =
@@ -85,7 +162,7 @@ class StoreConfigurationService {
         // console.log("DESDE getStoreConfiguration : SERVICES", existConfig);
         // console.log("existConfig.footerConfig", existConfig.footerConfig);
 
-        if (!existConfig.footerConfig) {
+        if (!existConfig.footerConfig || !existConfig.logoConfig) {
           const newData = {
             ...existConfig,
             footerConfig: {
@@ -99,6 +176,9 @@ class StoreConfigurationService {
                 whatsapp: "5492966605314",
                 storeAddress: "Argentina - Salta - Av Siempre Viva 678",
               },
+            },
+            logoConfig: {
+              logoUrl: logoLegacyUrlPublic,
             },
           };
 
