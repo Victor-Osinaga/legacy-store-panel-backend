@@ -124,25 +124,45 @@ if (config.env == "dev") {
 }
 const corsOptions = {
   origin: (origin, callback) => {
-    // Permitir solicitudes sin origen, como desde POSTMAN o cURL
+    //   // Permitir solicitudes sin origen, como desde POSTMAN o cURL
+    //   if (!origin) return callback(null, true);
+
+    //   // Extraer el subdominio usando la expresión regular
+    //   const match = origin.match(allowedOriginPatternFrontStore);
+
+    //   if (match) {
+    //     const subdomain = match[1]; // 'viktor' en 'http://viktor-legacy.localhost:5173'
+    //     console.log(`Subdominio detectado STORE MODO ${config.env} :`, subdomain);
+
+    //     // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
+
+    //     return callback(null, true);
+    //   }
+    //   if (allowedOrigins.includes(origin)) {
+    //     callback(null, true);
+    //   } else {
+    //     callback(new Error("No permitido por CORSSSSS"));
+    //   }
+    // },
+    // credentials: true, // Habilita el envío de credenciales
+    // Permitir solicitudes sin origen (Postman, cURL)
     if (!origin) return callback(null, true);
 
-    // Extraer el subdominio usando la expresión regular
-    const match = origin.match(allowedOriginPatternFrontStore);
-
-    if (match) {
-      const subdomain = match[1]; // 'viktor' en 'http://viktor-legacy.localhost:5173'
-      console.log(`Subdominio detectado STORE MODO ${config.env} :`, subdomain);
-
-      // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
-
+    // Validar contra allowedOrigins
+    if (allowedOrigins.includes(origin)) {
+      console.log(`CORS: Dominio permitido -> ${origin}`);
       return callback(null, true);
     }
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("No permitido por CORSSSSS"));
+
+    // Validar contra el patrón dinámico para subdominios
+    if (allowedOriginPatternFrontStore.test(origin)) {
+      console.log(`CORS: Subdominio permitido -> ${origin}`);
+      return callback(null, true);
     }
+
+    // Bloquear otros orígenes
+    console.error(`CORS: Origen bloqueado -> ${origin}`);
+    return callback(new Error("No permitido por CORS"));
   },
   credentials: true, // Habilita el envío de credenciales
 };
