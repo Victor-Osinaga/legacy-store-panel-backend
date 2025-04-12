@@ -7,45 +7,82 @@ import getUrlBase from "../../utils/getUrlBase.js";
 import { fileURLToPath } from "url";
 import path from "path";
 import { existsSync } from "fs"; // Para verificar si existe el archivo localmente
+import {
+  defaultConfigStore,
+  defaultLogoDetails,
+} from "../../utils/defaultConfigStore/defautlConfig.js";
+import checkIfFileExistsInStorage from "../../utils/firebase/checkIfFileExistsInStorage.js";
+import uploadLocalFileAndGetPublicUrl from "../../utils/firebase/uploadLocalFileAndGetPublicUrl.js";
+import uploadLogo from "../../utils/firebase/uploadLogo.js";
 
 class StoreConfigurationService {
   constructor(repository) {
     this.storeConfigurationRepository = repository;
   }
 
-  async createStoreConfiguration(body) {
+  async createDefaultStoreConfig() {
     try {
       const existConfigName =
         await this.storeConfigurationRepository.repoGetStoreConfigurationByName(
-          body.storeConfigName
+          defaultConfigStore.storeConfigName
         );
       console.log("existConfigName", existConfigName);
 
       if (existConfigName != null)
         throw {
-          msg: "Ya existe una confiracion para tu tienda con este nombre",
+          msg: "Ya existe una configuracion para tu tienda con este nombre",
           status: 400,
         };
 
-      const { storeConfigName, primaryColorStore } = body;
+      // const verify = async () => {
+      const { filename } = defaultLogoDetails;
+      // Obtener la ruta __dirname en módulos ES6
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = path.dirname(__filename);
+      // Ruta del archivo local que quieres subir
+      const localFilePath = path.join(__dirname, "../../../assets", filename); // Nombre del archivo en Firebase Storage
 
-      const configNoDto = new StoreConfiguration({
-        id: uuidv4(),
-        storeConfigName: body.storeConfigName,
-        colors: {
-          primaryColorStore: body.colors.primaryColorStore,
-          secondaryColorStore: body.colors.secondaryColorStore,
-          tertiaryColorStore: body.colors.tertiaryColorStore,
-        },
-        // primaryColorStore
-      });
-
-      const createdStoreConfig =
-        await this.storeConfigurationRepository.repoCreateStoreConfiguration(
-          configNoDto.convertToDTO()
+      const { exists, publicUrl } = await checkIfFileExistsInStorage(filename);
+      let logoLegacyUrlPublic;
+      if (!exists) {
+        if (!existsSync(localFilePath)) {
+          console.log(
+            "El archivo no existe en la ruta local especificada",
+            localFilePath
+          );
+          return;
+        }
+        console.log("El archivo si existe en la ruta local especificada");
+        const { uploaded, publicUrl } = await uploadLocalFileAndGetPublicUrl(
+          localFilePath,
+          filename
         );
+        if (!uploaded) {
+          throw {
+            msg: `No se pudo subir el archivo: ${filename}`,
+            status: 500,
+          };
+        }
 
-      return createdStoreConfig;
+        logoLegacyUrlPublic = publicUrl;
+
+        const configNoDto = new StoreConfiguration({
+          ...defaultConfigStore,
+          logoConfig: {
+            logoUrl: logoLegacyUrlPublic,
+          },
+        });
+
+        const createdStoreConfig =
+          await this.storeConfigurationRepository.repoCreateStoreConfiguration(
+            configNoDto.convertToDTO()
+          );
+
+        return createdStoreConfig;
+      }
+      // };
+
+      // logoLegacyUrlPublic = publicUrl;
     } catch (error) {
       console.log("desde store configuration service", error);
       throw error;
@@ -57,85 +94,15 @@ class StoreConfigurationService {
       const existConfig =
         await this.storeConfigurationRepository.repoGetStoreConfiguration();
 
-      // Obtener la ruta __dirname en módulos ES6
-      const __filename = fileURLToPath(import.meta.url);
-      const __dirname = path.dirname(__filename);
-      // Ruta del archivo local que quieres subir
-      const localFilePath = path.join(
-        __dirname,
-        "../../../assets",
-        "logolegacy.svg"
-      ); // Nombre del archivo en Firebase Storage
-      const storageFilePath = "logolegacy.svg";
-      // Función para verificar si el archivo ya existe en Firebase Storage
-      const bucket = firebaseInitializer.storage().bucket();
-      const checkIfFileExistsInStorage = async (filePath) => {
-        try {
-          const file = bucket.file(filePath);
-          const [exists] = await file.exists();
-          return exists;
-        } catch (error) {
-          console.error(
-            "Error al verificar la existencia del archivo en Firebase Storage:",
-            error
-          );
-          return false;
-        }
-      };
-
-      const fileExists = await checkIfFileExistsInStorage(storageFilePath);
-      let logoLegacyUrlPublic;
-      if (fileExists) {
-        console.log("El archivo ya existe en Firebase Storage.");
-        const fileLogoLegacy = bucket.file("logolegacy.svg");
-        const [url] = await fileLogoLegacy.getSignedUrl({
-          action: "read",
-          expires: "03-09-2491",
-        });
-        const urlBase = getUrlBase(url);
-        console.log("url", url);
-        console.log("urlBase", urlBase);
-
-        logoLegacyUrlPublic = urlBase;
-      } else {
-        console.log("El archivo no existe en Firebase Storage");
-        if (!existsSync(localFilePath)) {
-          console.log(
-            "El archivo no existe en la ruta local especificada",
-            localFilePath
-          );
-          return;
-        } else {
-          console.log("El archivo si existe en la ruta local especificada");
-          // Subir el archivo si no existe en Firebase Storage
-          await bucket.upload(localFilePath, {
-            destination: storageFilePath,
-            public: true,
-          });
-          console.log("Archivo subido exitosamente a Firebase Storage!");
-          const fileLogoLegacy = bucket.file("logolegacy.svg");
-          const [url] = await fileLogoLegacy.getSignedUrl({
-            action: "read",
-            expires: "03-09-2491",
-          });
-          const urlBase = getUrlBase(url);
-          console.log("url", url);
-          console.log("urlBase", urlBase);
-
-          logoLegacyUrlPublic = urlBase;
-        }
+      if (!existConfig) {
+        const createdConfig = await this.createDefaultStoreConfig();
+        return createdConfig;
       }
 
-      if (!existConfig) {
-        const configNoDto = new StoreConfiguration({
-          id: uuidv4(),
-          storeConfigName: "Default",
-          colors: {
-            // primaryColorStore: "#1877f2",
-            primaryColorStore: "#084c61",
-            secondaryColorStore: "#2B2D38",
-            tertiaryColorStore: "#23252F",
-          },
+      // TODO: REVISAR
+      if (!existConfig.footerConfig || !existConfig.logoConfig) {
+        const newData = {
+          ...existConfig,
           footerConfig: {
             colors: {
               primaryColorFooter: "#000000",
@@ -151,48 +118,18 @@ class StoreConfigurationService {
           logoConfig: {
             logoUrl: logoLegacyUrlPublic,
           },
-        });
+        };
 
-        const createdStoreConfig =
-          await this.storeConfigurationRepository.repoCreateStoreConfiguration(
-            configNoDto.convertToDTO()
+        // console.log("NEW DATA", newData);
+
+        const updatedConfig =
+          await this.storeConfigurationRepository.repoUpdateStoreConfiguration(
+            existConfig.id,
+            newData
           );
-        return createdStoreConfig;
-      } else {
-        // console.log("DESDE getStoreConfiguration : SERVICES", existConfig);
-        // console.log("existConfig.footerConfig", existConfig.footerConfig);
-
-        if (!existConfig.footerConfig || !existConfig.logoConfig) {
-          const newData = {
-            ...existConfig,
-            footerConfig: {
-              colors: {
-                primaryColorFooter: "#000000",
-              },
-              social: {
-                instagram: "https://www.instagram.com",
-                facebook: "https://www.facebook.com",
-                gmail: "test@test.com",
-                whatsapp: "5492966605314",
-                storeAddress: "Argentina - Salta - Av Siempre Viva 678",
-              },
-            },
-            logoConfig: {
-              logoUrl: logoLegacyUrlPublic,
-            },
-          };
-
-          // console.log("NEW DATA", newData);
-
-          const updatedConfig =
-            await this.storeConfigurationRepository.repoUpdateStoreConfiguration(
-              existConfig.id,
-              newData
-            );
-          return updatedConfig;
-        }
-        return existConfig;
+        return updatedConfig;
       }
+      return existConfig;
     } catch (error) {
       console.log("desde store configuration service", error);
       throw error;
@@ -220,14 +157,43 @@ class StoreConfigurationService {
         ...body,
       });
 
-      const createdStoreConfig =
+      const updatedConfig =
         await this.storeConfigurationRepository.repoUpdateStoreConfiguration(
           existConfig.id,
           configNoDto.convertToDTO()
         );
-      return createdStoreConfig;
+      return updatedConfig;
     } catch (error) {
       console.log("desde store configuration service", error);
+      throw error;
+    }
+  }
+
+  async updateLogoStoreConfig(req) {
+    try {
+      const getConfigStore =
+        await this.storeConfigurationRepository.repoGetStoreConfiguration();
+      console.log("getConfigStore: updateLogoStoreConfig", getConfigStore);
+
+      const uploadAndGetUrl = await uploadLogo(
+        req.processedLogo,
+        `${uuidv4()}.webp`
+      );
+
+      const updatedConfigWithUrlLogo =
+        await this.storeConfigurationRepository.repoUpdateLogoStoreConfig(
+          getConfigStore.id,
+          uploadAndGetUrl
+        );
+
+      console.log("updatedConfigWithUrlLogo: ", updatedConfigWithUrlLogo);
+
+      return updatedConfigWithUrlLogo;
+    } catch (error) {
+      console.log(
+        "desde store configuration service: updateLogoStoreConfig",
+        error
+      );
       throw error;
     }
   }
@@ -241,7 +207,10 @@ class StoreConfigurationService {
 
       return existConfig;
     } catch (error) {
-      console.log("desde store configuration service", error);
+      console.log(
+        "desde store configuration service: getStoreConfigurationStore",
+        error
+      );
       throw error;
     }
   }

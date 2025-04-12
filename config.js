@@ -27,6 +27,9 @@ const config = {
   // ENV ______________________________________________________________
   env: process.argv[2],
 
+  // VERCEL TOKEN
+  vercel_token: process.env.VERCEL_TOKEN,
+
   emailAdmin: process.env.EMAIL_ADMIN,
   google: {
     user: process.env.EMAIL_ADMIN,

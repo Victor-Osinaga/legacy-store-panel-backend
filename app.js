@@ -124,44 +124,29 @@ if (config.env == "dev") {
 }
 const corsOptions = {
   origin: (origin, callback) => {
-    //   // Permitir solicitudes sin origen, como desde POSTMAN o cURL
-    //   if (!origin) return callback(null, true);
+    if (!origin) {
+      console.log("CORS: Solicitud sin origen (permitida)");
+      return callback(null, true);
+    }
 
-    //   // Extraer el subdominio usando la expresión regular
-    //   const match = origin.match(allowedOriginPatternFrontStore);
-
-    //   if (match) {
-    //     const subdomain = match[1]; // 'viktor' en 'http://viktor-legacy.localhost:5173'
-    //     console.log(`Subdominio detectado STORE MODO ${config.env} :`, subdomain);
-
-    //     // Aquí puedes implementar lógica adicional basada en el subdominio, si es necesario
-
-    //     return callback(null, true);
-    //   }
-    //   if (allowedOrigins.includes(origin)) {
-    //     callback(null, true);
-    //   } else {
-    //     callback(new Error("No permitido por CORSSSSS"));
-    //   }
-    // },
-    // credentials: true, // Habilita el envío de credenciales
-    // Permitir solicitudes sin origen (Postman, cURL)
-    if (!origin) return callback(null, true);
+    // 🔹 Normalizar el origin (eliminar barra final si existe)
+    const normalizedOrigin = origin.replace(/\/$/, "");
+    // const normalizedOrigin = origin;
 
     // Validar contra allowedOrigins
-    if (allowedOrigins.includes(origin)) {
-      console.log(`CORS: Dominio permitido -> ${origin}`);
+    if (allowedOrigins.includes(normalizedOrigin)) {
+      // console.log(`CORS: Dominio permitido -> ${origin}`);
       return callback(null, true);
     }
 
     // Validar contra el patrón dinámico para subdominios
-    if (allowedOriginPatternFrontStore.test(origin)) {
-      console.log(`CORS: Subdominio permitido -> ${origin}`);
+    if (allowedOriginPatternFrontStore.test(normalizedOrigin)) {
+      // console.log(`CORS: Subdominio permitido -> ${origin}`);
       return callback(null, true);
     }
 
     // Bloquear otros orígenes
-    console.error(`CORS: Origen bloqueado -> ${origin}`);
+    console.error(`CORS: Origen bloqueado -> ${normalizedOrigin}`);
     return callback(new Error("No permitido por CORS"));
   },
   credentials: true, // Habilita el envío de credenciales

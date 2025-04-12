@@ -9,6 +9,7 @@ import getClientDb from "../../middlewares/getClientDb.js";
 const v1CategoryRouter = new Router();
 const v1CategorieRouterStore = new Router();
 
+// ENDPOINTS CATEGORY PANEL
 // v1OrderRouter.get('/', isLogged, isAdmin, categoryController.getOrders)
 v1CategoryRouter.get(
   "/",
@@ -20,19 +21,23 @@ v1CategoryRouter.post(
   "/",
   verifyTokenAdmin,
   getClientDb,
-  categoryController.createCategory
+  categoryController.createCategory2
 );
 // v1CategoryRouter.get('/:id', categoryController.getCategoryById)
 v1CategoryRouter.delete(
-  "/:id",
+  "/:idPrimary",
   verifyTokenAdmin,
   getClientDb,
   categoryController.deleteCategoryById
 );
-// v1CategoryRouter.put('/:id',isLogged, isAdmin, categoryController.updateCategoryById)
-// v1OrderRouter.get('/payment/failure', categoryController.getFailureController)
+v1CategoryRouter.put(
+  "/update-primary/:idPrimary",
+  verifyTokenAdmin,
+  getClientDb,
+  categoryController.updatePrimaryById
+);
 
-// ENDPONTS CATEGORIE STORE
+// ENDPONTS CATEGORY STORE
 v1CategorieRouterStore.post(
   "/",
   verifySubdomain,

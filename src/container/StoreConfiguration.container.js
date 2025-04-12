@@ -1,91 +1,120 @@
 import mongoose from "mongoose";
-mongoose.set('strictQuery', false);
+mongoose.set("strictQuery", false);
 
 export default class StoreConfigurationMongo {
-    constructor(collection, schema, urlDatabase) {
-        console.log("CONTAINER STORE CONFIGURATION CREADO");
+  constructor(collection, schema, urlDatabase) {
+    console.log("CONTAINER STORE CONFIGURATION CREADO");
 
-        const newConnection = mongoose.createConnection(urlDatabase, {
-            useUnifiedTopology: true,
-            useNewUrlParser: true,
-            // dbName: dbname,
-        });
-        this.collectionName = collection;
-        this.schema = schema;
-        this.connections = {}; // Almacena conexiones de base de datos por URL o identificador
-        this.collection = newConnection.model(this.collectionName, this.schema);
+    const newConnection = mongoose.createConnection(urlDatabase, {
+      useUnifiedTopology: true,
+      useNewUrlParser: true,
+      // dbName: dbname,
+    });
+    this.collectionName = collection;
+    this.schema = schema;
+    this.connections = {}; // Almacena conexiones de base de datos por URL o identificador
+    this.collection = newConnection.model(this.collectionName, this.schema);
+  }
+
+  async createStoreConfiguration(storeConfigDto) {
+    try {
+      const storeConfig = new this.collection(storeConfigDto);
+      const savedStoreConfig = await storeConfig.save(storeConfigDto);
+      if (!savedStoreConfig)
+        throw {
+          msg: "Error en BD al crear la store configuration",
+          status: 500,
+        };
+      const newStoreConfig = await this.collection
+        .findOne({ id: storeConfigDto.id }, { _id: 0, __v: 0 })
+        .lean();
+      console.log("newStoreConfig", newStoreConfig);
+
+      return newStoreConfig;
+    } catch (error) {
+      console.log("error desde container createStoreConfiguration: ", error);
+
+      throw error;
     }
+  }
 
-    async createStoreConfiguration(storeConfigDto) {
-        try {
-            const storeConfig = new this.collection(storeConfigDto)
-            const savedStoreConfig = await storeConfig.save(storeConfigDto)
-            if (!savedStoreConfig) throw { msg: "Error en BD al crear la store configuration", status: 500 }
-            const newStoreConfig = await this.collection.findOne({ id: storeConfigDto.id }, { _id: 0, __v: 0 }).lean();
-            console.log("newStoreConfig", newStoreConfig);
+  async getStoreConfigurationByName(storeConfigName) {
+    try {
+      const configByName = await this.collection
+        .findOne({ storeConfigName: storeConfigName }, { _id: 0, __v: 0 })
+        .lean();
+      console.log("desde container configByName: ", configByName);
 
-
-            return newStoreConfig
-        } catch (error) {
-            console.log("error desde container createStoreConfiguration: ", error);
-
-            throw error
-        }
+      return configByName;
+    } catch (error) {
+      console.log("error desde container storeConfiguration", error);
+      throw error;
     }
+  }
 
-    async getStoreConfigurationByName(storeConfigName) {
-        try {
-            const configByName = await this.collection.findOne({ storeConfigName: storeConfigName }, { _id: 0, __v: 0 }).lean();
-            console.log("desde container configByName: ", configByName);
+  async getStoreConfiguration() {
+    try {
+      const configStore = await this.collection
+        .findOne({}, { _id: 0, __v: 0 })
+        .lean();
+      console.log("desde container getStoreConfiguration: ", configStore);
 
-            return configByName
-        } catch (error) {
-            console.log("error desde container storeConfiguration", error);
-            throw error
-        }
+      return configStore;
+    } catch (error) {
+      console.log("error desde container getStoreConfiguration", error);
+      throw error;
     }
+  }
 
-    async getStoreConfiguration() {
-        try {
-            const configStore = await this.collection.findOne({}, { _id: 0, __v: 0 }).lean();
-            console.log("desde container getStoreConfiguration: ", configStore);
+  async getStoreConfigurationById(configId) {
+    return await this.collection
+      .findOne({ id: configId }, { _id: 0, __v: 0 })
+      .lean();
+  }
 
-            return configStore
-        } catch (error) {
-            console.log("error desde container getStoreConfiguration", error);
-            throw error
-        }
+  async updateStoreConfiguration(idConfig, newData) {
+    const update = await this.collection.updateOne(
+      { id: idConfig },
+      {
+        $set: {
+          id: idConfig,
+          ...newData,
+        },
+      }
+    );
+    return await this.collection
+      .findOne({ id: idConfig }, { _id: 0, __v: 0 })
+      .lean();
+  }
+
+  async updateLogoStoreConfig(id, newUrlLogo) {
+    try {
+      const updatedLogo = await this.collection.findOneAndUpdate(
+        { id: id },
+        { $set: { "logoConfig.logoUrl": newUrlLogo } },
+        { new: true }
+      );
+
+      return updatedLogo;
+    } catch (error) {
+      console.log("error desde container updateLogoStoreConfig", error);
+      throw error;
     }
+  }
 
-    async getStoreConfigurationById(configId) {
-        return await this.collection.findOne({ id: configId }, { _id: 0, __v: 0 }).lean();
+  // API CONTAINER CONFIG STORE
+
+  async getStoreConfigurationStore() {
+    try {
+      const configStore = await this.collection
+        .findOne({}, { _id: 0, __v: 0 })
+        .lean();
+      console.log("desde container getStoreConfiguration: ", configStore);
+
+      return configStore;
+    } catch (error) {
+      console.log("error desde container getStoreConfiguration", error);
+      throw error;
     }
-
-    async updateStoreConfiguration(idConfig, newData) {
-        const update = await this.collection.updateOne(
-            { id: idConfig },
-            {
-                $set: {
-                    id: idConfig,
-                    ...newData
-                },
-            }
-        );
-        return await this.collection.findOne({ id: idConfig }, { _id: 0, __v: 0 }).lean();
-    }
-
-    // API CONTAINER CONFIG STORE
-    
-    async getStoreConfigurationStore() {
-        try {
-            const configStore = await this.collection.findOne({}, { _id: 0, __v: 0 }).lean();
-            console.log("desde container getStoreConfiguration: ", configStore);
-
-            return configStore
-        } catch (error) {
-            console.log("error desde container getStoreConfiguration", error);
-            throw error
-        }
-    }
+  }
 }
-

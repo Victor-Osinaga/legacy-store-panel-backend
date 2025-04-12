@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 import * as productController from "../../controller/product/product.controller.js";
 
 import firebase from "firebase-admin";
-import multer from "multer";
 import config from "../../../config.js";
 import { deleteFolderRecursive } from "../../utils/deletePath.js";
 import { productServiceFactory } from "../../service/product/product.factory.js";
@@ -15,8 +14,8 @@ import verifyTokenAdmin from "../../middlewares/verifyTokenAdmin.js";
 import getClientDb from "../../middlewares/getClientDb.js";
 import firebaseInitializer from "../../utils/firebase/initializeFirebase.js";
 import uploadImageProductFirebase from "../../middlewares/uploadImageProductFirebase.js";
-
-const upload = multer({ dest: "/tmp/uploads" });
+import { uploadMemory } from "../../utils/multer/multerMemory..js";
+import deleteProductImage from "../../utils/firebase/deleteProductImage.firebase.js";
 
 const folderPath = "/tmp/uploads";
 
@@ -46,45 +45,54 @@ v1ProductRouter.delete(
   "/:id",
   verifyTokenAdmin,
   getClientDb,
-  async (req, res, next) => {
-    try {
-      const bucket = firebaseInitializer.storage().bucket();
+  deleteProductImage,
+  // async (req, res, next) => {
+  //   try {
+  //     const bucket = firebaseInitializer.storage().bucket();
 
-      // buscar producto
-      const dbname = req.proyectName;
-      const productService = await productServiceFactory(dbname);
-      const findProduct = await productService.getProductById(req.params.id);
+  //     // buscar producto
+  //     const dbname = req.proyectName;
+  //     const productService = await productServiceFactory(dbname);
+  //     const findProduct = await productService.getProductById(req.params.id);
 
-      // encontrar la extension
-      const regex = /(?:\.([^.?]+))(?:\?.*)?$/;
-      const extension = findProduct.image.match(regex)[1];
+  //     if (!findProduct) {
+  //       return res.status(400).json({
+  //         status: "failed",
+  //         data: "No se encontro un producto con ese ID",
+  //       });
+  //     }
 
-      // buscar el archivo
-      const file = bucket.file(`${req.params.id}.${extension}`);
+  //     // encontrar la extension
+  //     const regex = /\.([^.?]+)(?:\?.*)?$/;
+  //     const match = findProduct.image.match(regex);
+  //     const extension = match ? match[1] : null;
 
-      // comprobar si existe
-      const [exists] =
-        await file.exists(); /* La respues viene como: [false] o [true] */
+  //     if (!extension) {
+  //       console.log("No se pudo determinar la extensión de la imagen");
+  //       return next();
+  //     }
+  //     const file = bucket.file(`${req.params.id}.${extension}`);
+  //     try {
+  //       // Comprobar si existe
+  //       const [exists] = await file.exists();
 
-      if (exists) {
-        const xd = await file.delete();
-        next();
-      } else {
-        // throw { msg: "Imagen no encontrada", status: 404 }
-        console.log("Imagen no encontrada");
-        next();
-      }
-    } catch (error) {
-      console.log("desde middleware eliminar imagen : product router", error);
-      if (error.code) {
-        return res.status(error.code).json({
-          status: "failed",
-          data: "No se pudo eliminar la imagen porque no existe",
-        });
-      }
-      res.status(error.status).json({ status: "failed", data: error.msg });
-    }
-  },
+  //       if (exists) {
+  //         await file.delete();
+  //         console.log(`Imagen ${req.params.id}.${extension} eliminada`);
+  //       } else {
+  //         console.log("Imagen no encontrada");
+  //       }
+
+  //       next(); // Continuar con el siguiente middleware
+  //     } catch (error) {
+  //       console.error("Error al verificar/eliminar la imagen:", error);
+  //       next(error); // Pasar el error al middleware de manejo de errores
+  //     }
+  //   } catch (error) {
+  //     console.error("Error en middleware eliminar imagen de producto:", error);
+  //     next(error); // Pasar el error al middleware de manejo de errores
+  //   }
+  // },
   productController.deleteProductById
 );
 
@@ -92,54 +100,16 @@ v1ProductRouter.put(
   "/:id",
   verifyTokenAdmin,
   getClientDb,
-  upload.none(),
+  uploadMemory.none(),
   /*isLogged, isAdmin,*/ productController.updateProductById
 );
 
 v1ProductRouter.post(
   "/",
+  uploadMemory.single("image"),
   verifyTokenAdmin,
   getClientDb,
-  upload.single("image"),
-  // (req, res, next) => {
-  //   const file = req.file;
-  //   const bucket = firebaseInitializer.storage().bucket();
-  //   const customId = uuidv4();
-  //   const extension = req.file.originalname.split(".").pop();
-  //   const newFileName = `${customId}.${extension}`;
-  //   bucket
-  //     .upload(file.path, {
-  //       destination: newFileName,
-  //       public: true,
-  //     })
-  //     .then(() => {
-  //       const fileNew = bucket.file(newFileName);
-
-  //       fileNew
-  //         .getSignedUrl({
-  //           action: "read",
-  //           expires: "03-09-2491",
-  //         })
-  //         .then((signedUrls) => {
-  //           const url = signedUrls[0];
-  //           const urlBase = getUrlBase(url);
-  //           console.log("url", url);
-  //           console.log("urlBase", urlBase);
-
-  //           req.body.image = urlBase;
-  //           req.body.id = customId;
-  //           deleteFolderRecursive(folderPath);
-  //           next();
-  //         })
-  //         .catch((err) => {
-  //           console.error(`Error al obtener la URL: ${err}`);
-  //         });
-  //     })
-  //     .catch((error) => {
-  //       res.status(500).send(error);
-  //     });
-  // },
-  uploadImageProductFirebase,
+  // uploadImageProductFirebase,
   productController.createProduct
 );
 
