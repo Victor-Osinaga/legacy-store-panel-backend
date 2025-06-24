@@ -8,7 +8,6 @@ v1ClientAdminRouter.post(
   "/auth/register",
   clientAdminController.createClientAdmin
 );
-// v1ClientRouter.get('/', clientController.getClients)
 v1ClientAdminRouter.post("/auth/login", clientAdminController.loginClientAdmin);
 v1ClientAdminRouter.post(
   "/auth/logout",

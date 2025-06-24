@@ -46,12 +46,7 @@ class ClientAdminService {
         await this.clientAdminRepository.repoCreateClientAdmin(
           newClientAdminDto.convertToDTO()
         );
-      const { subdomain, proyectName } = registeredClientAdmin;
-      // try {
 
-      // } catch (error) {
-
-      // }
       if (registeredClientAdmin) {
         const storeConfigurationService = await storeConfigurationFactory(
           registeredClientAdmin.proyectName
@@ -63,6 +58,7 @@ class ClientAdminService {
           createdStoreConfig
         );
         if (createdStoreConfig) {
+          const { subdomain, proyectName } = registeredClientAdmin;
           return { subdomain, proyectName };
         }
       }

@@ -1,5 +1,4 @@
 import firebaseInitializer from "./initializeFirebase.js";
-import { defaultLogoDetails } from "../defaultConfigStore/defautlConfig.js";
 import getUrlBase from "../getUrlBase.js";
 
 export default async function checkIfFileExistsInStorage(filename) {

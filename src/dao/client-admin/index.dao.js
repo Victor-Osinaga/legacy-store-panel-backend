@@ -2,11 +2,11 @@ import config from "../../../config.js";
 import { clientAdminSquema } from "../../model/client-admin/squema/clientAdmin.schema.js";
 
 let clientAdminDao;
-console.log("config.dev_url_database_admin", config.dev_url_database_admin);
 
 switch (config.env) {
   case "dev":
     console.log("modo dev");
+    // console.log("config.dev_url_database_admin", config.dev_url_database_admin);
     const { default: ClientAdminDevDAO } = await import(
       "./ClientAdminDev.dao.js"
     );

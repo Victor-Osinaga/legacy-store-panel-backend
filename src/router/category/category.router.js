@@ -1,7 +1,6 @@
 import { Router } from "express";
 import * as categoryController from "../../controller/category/category.controller.js";
 // import { isLogged } from "../../middlewares/isLogged.js";
-// import { isAdmin } from "../../middlewares/isAdmin.js";
 import verifySubdomain from "../../middlewares/verifySubdomain.js";
 import verifyTokenAdmin from "../../middlewares/verifyTokenAdmin.js";
 import getClientDb from "../../middlewares/getClientDb.js";
@@ -10,7 +9,6 @@ const v1CategoryRouter = new Router();
 const v1CategorieRouterStore = new Router();
 
 // ENDPOINTS CATEGORY PANEL
-// v1OrderRouter.get('/', isLogged, isAdmin, categoryController.getOrders)
 v1CategoryRouter.get(
   "/",
   verifyTokenAdmin,

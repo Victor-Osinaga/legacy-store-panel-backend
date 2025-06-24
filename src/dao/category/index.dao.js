@@ -37,7 +37,7 @@ async function getCategoryDao(dbName) {
     categoryDao = new CategoryProdDAO(
       "categories",
       categorySchema2,
-      `${config.prod_url1}${dbName}?retryWrites=true&w=majority&appName=Ecommerce`
+      `${config.prod_url}${dbName}?retryWrites=true&w=majority&appName=Ecommerce`
     );
   }
 

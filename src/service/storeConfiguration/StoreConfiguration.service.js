@@ -14,6 +14,7 @@ import {
 import checkIfFileExistsInStorage from "../../utils/firebase/checkIfFileExistsInStorage.js";
 import uploadLocalFileAndGetPublicUrl from "../../utils/firebase/uploadLocalFileAndGetPublicUrl.js";
 import uploadLogo from "../../utils/firebase/uploadLogo.js";
+import deleteLogo from "../../utils/firebase/deleteLogo.js";
 
 class StoreConfigurationService {
   constructor(repository) {
@@ -82,7 +83,25 @@ class StoreConfigurationService {
       }
       // };
 
-      // logoLegacyUrlPublic = publicUrl;
+      // SI EL LOGO ESTA SUBIDO A FIREBASE ENTONCES:
+      logoLegacyUrlPublic = publicUrl;
+      const configNoDto = new StoreConfiguration({
+        ...defaultConfigStore,
+        logoConfig: {
+          logoUrl: logoLegacyUrlPublic,
+        },
+      });
+
+      console.log("-----------------------------");
+
+      console.log("configNoDto.convertToDTO()", configNoDto.convertToDTO());
+
+      const createdStoreConfig =
+        await this.storeConfigurationRepository.repoCreateStoreConfiguration(
+          configNoDto.convertToDTO()
+        );
+
+      return createdStoreConfig;
     } catch (error) {
       console.log("desde store configuration service", error);
       throw error;
@@ -100,35 +119,35 @@ class StoreConfigurationService {
       }
 
       // TODO: REVISAR
-      if (!existConfig.footerConfig || !existConfig.logoConfig) {
-        const newData = {
-          ...existConfig,
-          footerConfig: {
-            colors: {
-              primaryColorFooter: "#000000",
-            },
-            social: {
-              instagram: "https://www.instagram.com",
-              facebook: "https://www.facebook.com",
-              gmail: "test@test.com",
-              whatsapp: "5492966605314",
-              storeAddress: "Argentina - Salta - Av Siempre Viva 678",
-            },
-          },
-          logoConfig: {
-            logoUrl: logoLegacyUrlPublic,
-          },
-        };
+      // if (!existConfig.footerConfig || !existConfig.logoConfig) {
+      //   const newData = {
+      //     ...existConfig,
+      //     footerConfig: {
+      //       colors: {
+      //         primaryColorFooter: "#000000",
+      //       },
+      //       social: {
+      //         instagram: "https://www.instagram.com",
+      //         facebook: "https://www.facebook.com",
+      //         gmail: "test@test.com",
+      //         whatsapp: "5492966605314",
+      //         storeAddress: "Argentina - Salta - Av Siempre Viva 678",
+      //       },
+      //     },
+      //     logoConfig: {
+      //       logoUrl: logoLegacyUrlPublic,
+      //     },
+      //   };
 
-        // console.log("NEW DATA", newData);
+      //   // console.log("NEW DATA", newData);
 
-        const updatedConfig =
-          await this.storeConfigurationRepository.repoUpdateStoreConfiguration(
-            existConfig.id,
-            newData
-          );
-        return updatedConfig;
-      }
+      //   const updatedConfig =
+      //     await this.storeConfigurationRepository.repoUpdateStoreConfiguration(
+      //       existConfig.id,
+      //       newData
+      //     );
+      //   return updatedConfig;
+      // }
       return existConfig;
     } catch (error) {
       console.log("desde store configuration service", error);
@@ -171,13 +190,28 @@ class StoreConfigurationService {
 
   async updateLogoStoreConfig(req) {
     try {
+      console.log("req.clientId", req.clientId);
+
       const getConfigStore =
         await this.storeConfigurationRepository.repoGetStoreConfiguration();
       console.log("getConfigStore: updateLogoStoreConfig", getConfigStore);
 
+      const imageName = await getConfigStore.logoConfig.logoUrl
+        .split("/")
+        .pop();
+      // const deleteOldLogo = await deleteLogo(`${req.clientId}-logo.webp`);
+      const deleteOldLogo = await deleteLogo(imageName);
+
+      if (!deleteOldLogo) {
+        // Podrías loguear el error, o incluso lanzar uno si querés frenar la subida
+        console.log("No se pudo eliminar el logo anterior.");
+        // O: throw new Error("Falló la eliminación del logo anterior");
+      }
+
       const uploadAndGetUrl = await uploadLogo(
         req.processedLogo,
-        `${uuidv4()}.webp`
+        // `${uuidv4()}.webp`
+        `${req.clientId}-logo.webp`
       );
 
       const updatedConfigWithUrlLogo =

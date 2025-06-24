@@ -1,4 +1,5 @@
 import config from "./config.js";
+import getRepoId from "./src/utils/github/getRepoId.js";
 
 async function createAndDeployVercel() {
   //   const getProject = await fetch(
@@ -20,15 +21,17 @@ async function createAndDeployVercel() {
 
   //   return;
 
+  // NOMBRE DEL PROYECTO, ESTE SERIA EL NOMBRE DE PROYECTO QUE INGRESE EL USUARIO ______________________________________________________
+  const projectName = "victor-tiendaaa-legacystore";
   //   CREACION DEL PROYECTO _______________________________________________________________________________________________________________________________________________________________
-  const response = await fetch("https://api.vercel.com/v10/projects", {
+  const response = await fetch("https://api.vercel.com/v11/projects", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${config.vercel_token}`, // Token Vercel
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      name: "victor-tienda-legacystore", // Nombre del proyecto
+      name: projectName, // Nombre del proyecto
       gitRepository: {
         repo: "Victor-Osinaga/legacy-store-frontend", // Repositorio en formato "owner/nombre-del-repo"
         type: "github", // Tipo de proveedor (puede ser "github", "gitlab", etc.)
@@ -48,10 +51,10 @@ async function createAndDeployVercel() {
           type: "encrypted", // Especifica el tipo
         },
       ],
-      //   installCommand: "npm install --omit=dev",
-      //   buildCommand: "npm run build",
-      //   devCommand: "npm run dev",
-      //   outputDirectory: "dist",
+      installCommand: "npm install", // --omit=dev se usa para omitir las dependencias de desarrollo, en este caso no es recomendable porque omite la instalacion del paquete "vite" que es necesario para hacer el build
+      buildCommand: "npm run build",
+      devCommand: "npm run dev",
+      outputDirectory: "dist",
     }),
   });
 
@@ -63,6 +66,11 @@ async function createAndDeployVercel() {
 
   const projectData = await response.json();
   console.log("Proyecto creado exitosamente:", projectData);
+
+  // OBTENIENDO ID DE REPOSITORIO LEGACY STORE ____________________________________________________
+  console.log("Obteniendo id del repositorio");
+  const repoId = await getRepoId();
+  console.log("id obtenido: ", repoId);
 
   //   DEPLOY DEL PROYECTO ___________________________________________________________________________________________________________________________________________________________________
   console.log("deployando...");
@@ -77,25 +85,33 @@ async function createAndDeployVercel() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        name: "victor-tienda-legacystore",
-        project: "victor-tienda-legacystore",
+        name: projectName, // si se usa "project" este queda inhabilitado
+        project: projectName,
         target: "production",
-        files: [],
-        gitMetadata: {
-          remoteUrl:
-            "https://github.com/Victor-Osinaga/legacy-store-frontend.git",
-          commitAuthorName: "victor", // Nombre del autor del commit, puedes usar tu nombre o el de la persona que hace el commit
-          commitMessage: "initial deploy client", // Mensaje del commit. Puedes personalizarlo según el mensaje del primer commit o el que se quiere usar.
-          commitRef: "main", // Usará el último commit de la rama "main"
-          commitSha: "ee85b030040c30ba71167d7e96bce64a76871548", // Esto debe ser el SHA del último commit, puedes obtenerlo con `git log` o `git rev-parse HEAD`
-        },
+        // files: [],
+        // gitMetadata: {
+        //   remoteUrl:
+        //     "https://github.com/Victor-Osinaga/legacy-store-frontend.git",
+        //   commitAuthorName: "victor", // Nombre del autor del commit, puedes usar tu nombre o el de la persona que hace el commit
+        //   commitMessage: "initial deploy client", // Mensaje del commit. Puedes personalizarlo según el mensaje del primer commit o el que se quiere usar.
+        //   commitRef: "main", // Usará el último commit de la rama "main"
+        //   commitSha: "ee85b030040c30ba71167d7e96bce64a76871548", // Esto debe ser el SHA del último commit, puedes obtenerlo con `git log` o `git rev-parse HEAD`
+        // },
         projectSettings: {
           //   buildCommand: "npm run build",
           //   devCommand: "npm run dev",
-          installCommand: "npm install --omit=dev",
+          installCommand: "npm install", // --omit=dev se usa para omitir las dependencias de desarrollo, en este caso no es recomendable porque omite la instalacion del paquete "vite" que es necesario para hacer el build
           framework: "vite",
           //   outputDirectory: "dist",
           //   rootDirectory: null,
+        },
+
+        // NEW
+        gitSource: {
+          ref: "main",
+          repoId: repoId,
+          type: "github",
+          // sha: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0",
         },
       }),
     }

@@ -36,7 +36,9 @@ const loginClientAdmin = async (req, res) => {
     res.status(200).json({ status: "ok", data: clientLoged });
   } catch (error) {
     console.log(error);
-    res.status(error.status).json({ status: "failed", data: error.msg });
+    res
+      .status(error?.status || 700)
+      .json({ status: "failed", data: error.msg });
   }
 };
 
@@ -49,7 +51,9 @@ const getClientAdminById = async (req, res) => {
     const client = await clientAdminService.getClientAdminById(req.clientId);
     res.status(200).json({ status: "okkk", data: client });
   } catch (error) {
-    res.status(error.status).json({ status: "failed", data: error.msg });
+    res
+      .status(error?.status || 700)
+      .json({ status: "failed", data: error.msg });
   }
 };
 

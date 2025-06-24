@@ -5,8 +5,7 @@ import getClientDbMetadata from "../../middlewares/getClientDbMetadata.js";
 import getClientDb from "../../middlewares/getClientDb.js";
 import verifyTokenAdmin from "../../middlewares/verifyTokenAdmin.js";
 
-// import { isLogged } from "../../middlewares/isLogged.js";
-// import { isAdmin } from "../../middlewares/isAdmin.js";
+import { isLogged } from "../../middlewares/isLogged.js";
 
 const v1OrderRouter = new Router();
 const v1OrderRouterStore = new Router();
@@ -15,7 +14,7 @@ const v1OrderRouterStore = new Router();
 
 // v1OrderRouter.post('/', orderController.createOrder)
 // v1OrderRouter.post('/payment', orderController.createPaymentMP)
-// v1OrderRouter.get('/', isLogged, isAdmin, orderController.getOrders)
+// v1OrderRouter.get('/', isLogged, orderController.getOrders)
 // v1OrderRouter.post('/notification-mp', orderController.getNotificationMP)
 // v1OrderRouter.get('/payment/success', orderController.getSuccessController)
 // v1OrderRouter.get('/payment/failure', orderController.getFailureController)

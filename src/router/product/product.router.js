@@ -7,7 +7,6 @@ import config from "../../../config.js";
 import { deleteFolderRecursive } from "../../utils/deletePath.js";
 import { productServiceFactory } from "../../service/product/product.factory.js";
 // import { isLogged } from "../../middlewares/isLogged.js";
-// import { isAdmin } from "../../middlewares/isAdmin.js";
 import getUrlBase from "../../utils/getUrlBase.js";
 import verifySubdomain from "../../middlewares/verifySubdomain.js";
 import verifyTokenAdmin from "../../middlewares/verifyTokenAdmin.js";
@@ -101,7 +100,7 @@ v1ProductRouter.put(
   verifyTokenAdmin,
   getClientDb,
   uploadMemory.none(),
-  /*isLogged, isAdmin,*/ productController.updateProductById
+  /*isLogged, */ productController.updateProductById
 );
 
 v1ProductRouter.post(
