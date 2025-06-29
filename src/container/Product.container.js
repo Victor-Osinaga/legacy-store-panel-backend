@@ -13,6 +13,7 @@ export default class ProductMongo {
 
   constructor(collection, schema, urlDatabase) {
     console.log("CONTAINER PRODUCT CREADO");
+    console.log("urlDatabase", urlDatabase);
 
     const newConnection = mongoose.createConnection(urlDatabase, {
       useUnifiedTopology: true,

@@ -4,6 +4,7 @@ mongoose.set("strictQuery", false);
 export default class StoreConfigurationMongo {
   constructor(collection, schema, urlDatabase) {
     console.log("CONTAINER STORE CONFIGURATION CREADO");
+    console.log("urlDatabase", urlDatabase);
 
     const newConnection = mongoose.createConnection(urlDatabase, {
       useUnifiedTopology: true,
